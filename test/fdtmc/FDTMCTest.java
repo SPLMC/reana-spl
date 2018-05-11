@@ -1,5 +1,8 @@
 package fdtmc;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,38 +45,26 @@ public class FDTMCTest {
 	 * states created in sequence will have index value in sequence.
 	 */
 	@Test
-	public void testCreateLotsOfStates() {
+	public void testCreateLotsOfStates() {		
+		int numStates = 5;
+		List<State> states = new ArrayList<>(numStates);
 		fdtmc1.setVariableName("x");
-		State s0, s1, s2, s3, s4, s5;
-		s0 = fdtmc1.createState();
-		s1 = fdtmc1.createState();
-		s2 = fdtmc1.createState();
-		s3 = fdtmc1.createState();
-		s4 = fdtmc1.createState();
-		s5 = fdtmc1.createState();
+		
+		for (int i = 0; i < numStates; i++) {
+			State state;
+			state = fdtmc1.createState();
+			
+			Assert.assertNotNull(state);
+			Assert.assertTrue(fdtmc1.getStates().contains(state));
+			
+			states.add(state);
+		}
+		
+		for (int i = 0; i < numStates; i++) {
+			Assert.assertEquals(i, states.get(i).getIndex());
+		}
 
-		Assert.assertNotNull(s0);
-		Assert.assertNotNull(s1);
-		Assert.assertNotNull(s2);
-		Assert.assertNotNull(s3);
-		Assert.assertNotNull(s4);
-		Assert.assertNotNull(s5);
-
-		Assert.assertTrue(fdtmc1.getStates().contains(s0));
-		Assert.assertTrue(fdtmc1.getStates().contains(s1));
-		Assert.assertTrue(fdtmc1.getStates().contains(s2));
-		Assert.assertTrue(fdtmc1.getStates().contains(s3));
-		Assert.assertTrue(fdtmc1.getStates().contains(s4));
-		Assert.assertTrue(fdtmc1.getStates().contains(s5));
-
-		Assert.assertEquals(0, s0.getIndex());
-		Assert.assertEquals(1, s1.getIndex());
-		Assert.assertEquals(2, s2.getIndex());
-		Assert.assertEquals(3, s3.getIndex());
-		Assert.assertEquals(4, s4.getIndex());
-		Assert.assertEquals(5, s5.getIndex());
-
-		Assert.assertEquals(s0, fdtmc1.getInitialState());
+		Assert.assertEquals(states.get(0), fdtmc1.getInitialState());
 	}
 
 
