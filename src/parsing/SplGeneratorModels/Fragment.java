@@ -53,17 +53,14 @@ public class Fragment extends SequenceDiagramElement{
 		SequenceDiagram rowSD = SequenceDiagram.createSequenceDiagram(
 				elementName, guard); 
 		boolean answer;
+		boolean diagramsIsEmpty = sequenceDiagrams.isEmpty();
 		switch (type) {
 		case OPTIONAL:
-			if (!sequenceDiagrams.isEmpty())
-				sequenceDiagrams.clear();
-			answer = sequenceDiagrams.add(rowSD);
+			answer = addRowSD(diagramsIsEmpty, rowSD);
 			break;
 
 		case PARALLEL:
-			if (!sequenceDiagrams.isEmpty())
-				sequenceDiagrams.clear();
-			answer = sequenceDiagrams.add(rowSD);
+			answer = addRowSD(diagramsIsEmpty, rowSD);
 			break;
 			
 		case ALTERNATIVE:
@@ -71,9 +68,7 @@ public class Fragment extends SequenceDiagramElement{
 			break;
 			
 		case LOOP: 
-			if (!sequenceDiagrams.isEmpty())
-				sequenceDiagrams.clear();
-			answer = sequenceDiagrams.add(rowSD);
+			answer = addRowSD(diagramsIsEmpty, rowSD);
 			break;
 		default:
 			answer = false; 
@@ -84,6 +79,13 @@ public class Fragment extends SequenceDiagramElement{
 			return rowSD; 
 		else 
 			return null; 
+	}
+	
+	public boolean addRowSD(boolean diagramsIsEmpty, SequenceDiagram rowSD) {
+		if (!diagramsIsEmpty) {
+			sequenceDiagrams.clear();
+		}
+		return sequenceDiagrams.add(rowSD);
 	}
 
 
