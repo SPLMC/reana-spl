@@ -183,6 +183,16 @@ public class ExpressionSolver {
      */
     private JEP makeADDParser(JADD jadd) {
         JEP parser = new JEP(false, true, true, new ADDNumberFactory(jadd));
+        parser = addMathematicalFunctions(parser);
+        parser = addLogicalFunctions(parser);
+        
+        return parser;
+    }
+
+	/**
+	 * @param parser
+	 */
+	private JEP addMathematicalFunctions(JEP parser) {
         parser.addFunction("\"+\"", new ADDAdd());
         parser.addFunction("\"-\":2", new ADDSubtract());
         parser.addFunction("\"-\":1", new UnaryMinus());
@@ -190,11 +200,19 @@ public class ExpressionSolver {
         parser.addFunction("\"^\"", new ADDPower(jadd));
         parser.addFunction("\"/\"", new ADDDivide());
 
-        parser.addFunction("\"&&\"", new LogicalAnd());
-        parser.addFunction("\"||\"", new LogicalOr());
-        parser.addFunction("\"!\"", new LogicalNot());
-        return parser;
+    	return parser;
     }
+	
+	/**
+	 * @param parser
+	 */	
+	private JEP addLogicalFunctions(JEP parser) {
+		parser.addFunction("\"&&\"", new LogicalAnd());
+		parser.addFunction("\"||\"", new LogicalOr());
+		parser.addFunction("\"!\"", new LogicalNot());
+		
+		return parser;
+	}
 
     /**
      * Makes a standard floating-point-based parser.
