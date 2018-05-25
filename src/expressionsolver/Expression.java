@@ -36,14 +36,17 @@ public class Expression<T> {
     public T solve(Map<String, T> interpretation) {
         SymbolTable symbolTable = parser.getSymbolTable();
         for (Object var: symbolTable.keySet()) {
-            String varName = (String)var;
-            if (interpretation.containsKey(varName)) {
-                parser.addVariableAsObject(varName, interpretation.get(varName));
-            } else {
-                LOGGER.warning("No interpretation for variable <"+varName+"> was provided");
-            }
+        	checkInterpretation((String) var, interpretation);
         }
         Object result = parser.getValueAsObject();
         return type.cast(result);
     }
+    
+    private void checkInterpretation(String var, Map<String, T> interpretation) {
+        if (interpretation.containsKey(var)) {
+            parser.addVariableAsObject(var, interpretation.get(var));
+        } else {
+            LOGGER.warning("No interpretation for variable <"+var+"> was provided");
+        }    	
+	}
 }
