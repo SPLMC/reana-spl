@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.sun.org.apache.xpath.internal.functions.Function;
+
 public class FDTMC {
 
     public static final String INITIAL_LABEL = "initial";
@@ -209,9 +211,13 @@ public class FDTMC {
 				Iterator <Transition> itTransitions = transitionList.iterator();
 				while (itTransitions.hasNext()) {
 					Transition t = itTransitions.next();
-					msg += temp.getVariableName() + "=" + temp.getIndex() + ((temp.getLabel() != null) ? "(" + temp.getLabel() + ")" : "") +
-							" --- " + t.getActionName() + " / " + t.getProbability() +
-							" ---> " + t.getTarget().getVariableName() + "=" + t.getTarget().getIndex() + ((t.getTarget().getLabel() != null) ? "(" + t.getTarget().getLabel() + ")" : "") + "\n";
+					String variableName = temp.getVariableName() + "=" + temp.getIndex();
+					String label = ((temp.getLabel() != null) ? "(" + temp.getLabel() + ")" : "");
+					String action = " --- " + t.getActionName() + " / " + t.getProbability();
+					String target = " ---> " + t.getTarget().getVariableName() + "=" + t.getTarget().getIndex();
+					String targetLabel = ((t.getTarget().getLabel() != null) ? "(" + t.getTarget().getLabel() + ")" : "") + "\n";
+					
+					msg += variableName + label + action + target + targetLabel;
 				}
 			}
 		}
