@@ -63,20 +63,8 @@ public class ActivityDiagramParser {
 					ade = ActivityDiagramElement.createElement(ActivityDiagramElement.ACTIVITY, 
 							elementName);
 					if (el.hasChildNodes()) {
-						//parse the sequence diagrams associated with it
-						NodeList children = el.getElementsByTagName("RepresentedBy"); 
-						 for (int k=0; k<children.getLength(); k++) {
-							 if (children.item(k).getNodeType() == Node.ELEMENT_NODE && 
-									 children.item(k).getNodeName().equals("RepresentedBy")){
-								 Element repBy = (Element) children.item(k); 
-								 NamedNodeMap attributes = repBy.getAttributes(); 
-								 String seqDiagName = attributes.getNamedItem("seqDiagName").getNodeValue(); 
-								 SequenceDiagram sd = SequenceDiagram.getSequenceDiagramByName(seqDiagName);
-								 Activity a = (Activity) ade; 
-								 a.addSequenceDiagram(sd); 
-							 }
-						 }
-						 answer.addElement(ade); 
+						answer = parseSequenceDiagrams (answer, el, ade);
+						 //answer.addElement(ade); 
 					}
 					break;
 				
@@ -117,23 +105,51 @@ public class ActivityDiagramParser {
 				elements.add(ade);
 			}
 			
-			for (int j=0; j<setOfTransitions.getLength(); j++) {
-				Element f = (Element) setOfTransitions.item(j);
-				NamedNodeMap map = f.getAttributes(); 
-				
-				String transitionName = map.getNamedItem("name").getNodeValue();
-				double transitionProbability = Double.parseDouble(
-						map.getNamedItem("probability").getNodeValue()); 
-				String sourceElement = map.getNamedItem("source").getNodeValue(); 
-				String targetElement = map.getNamedItem("target").getNodeValue();
-				
-				ActivityDiagramElement source = answer.getElementByName(sourceElement);
-				ActivityDiagramElement target = answer.getElementByName(targetElement);
-				Transition t = source.createTransition(target, transitionName, transitionProbability);
-				answer.addElement(t);
-			}
+			answer = parseTransitions(answer, setOfTransitions);
 		}
 		return answer;
 	}
+	
+	public static ActivityDiagram parseSequenceDiagrams(ActivityDiagram answer,
+												Element el, ActivityDiagramElement ade){
+			//parse the sequence diagrams associated with it
+			NodeList children = el.getElementsByTagName("RepresentedBy"); 
+			 for (int k=0; k<children.getLength(); k++) {
+				 if (children.item(k).getNodeType() == Node.ELEMENT_NODE && 
+						 children.item(k).getNodeName().equals("RepresentedBy")){
+					 Element repBy = (Element) children.item(k); 
+					 NamedNodeMap attributes = repBy.getAttributes(); 
+					 String seqDiagName = attributes.getNamedItem("seqDiagName").getNodeValue(); 
+					 SequenceDiagram sd = SequenceDiagram.getSequenceDiagramByName(seqDiagName);
+					 Activity a = (Activity) ade; 
+					 a.addSequenceDiagram(sd); 
+				 }
+			 }
+			 answer.addElement(ade); 
+		
+		return answer;
+	}
+	
+	public static ActivityDiagram parseTransitions(ActivityDiagram answer, 
+				 										NodeList setOfTransitions){
+		for (int j=0; j<setOfTransitions.getLength(); j++) {
+			Element f = (Element) setOfTransitions.item(j);
+			NamedNodeMap map = f.getAttributes(); 
+			
+			String transitionName = map.getNamedItem("name").getNodeValue();
+			double transitionProbability = Double.parseDouble(
+					map.getNamedItem("probability").getNodeValue()); 
+			String sourceElement = map.getNamedItem("source").getNodeValue(); 
+			String targetElement = map.getNamedItem("target").getNodeValue();
+			
+			ActivityDiagramElement source = answer.getElementByName(sourceElement);
+			ActivityDiagramElement target = answer.getElementByName(targetElement);
+			Transition t = source.createTransition(target, transitionName, transitionProbability);
+			answer.addElement(t);
+		}
+		return answer;
+	}
+	
+	
 
 }
