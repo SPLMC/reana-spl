@@ -230,24 +230,7 @@ public class ADD {
         while (cursor.hasNext()) {
             String variable = cursor.next();
             if (variable.startsWith("(")) {
-                // We must generate two alternative prefixes: one with the
-                // variable in positive form and another with it in negative
-                // form (i.e., omitted).
-                List<String> complementedPrefix = new LinkedList<String>(prefix);
-                String deparenthesized = variable.substring(1, variable.length()-1);
-                prefix.add(deparenthesized);
-                // Then we must expand the rest of the configuration and append
-                // each of the expanded sub-configurations to the alternative prefixes.
-                Collection<List<String>> expandedTail = expandDontCares(cursor);
-                for (List<String> expandedSubconfig : expandedTail) {
-                    List<String> positive = new LinkedList<String>(prefix);
-                    List<String> complemented = new LinkedList<String>(complementedPrefix);
-                    positive.addAll(expandedSubconfig);
-                    complemented.addAll(expandedSubconfig);
-                    expanded.add(positive);
-                    expanded.add(complemented);
-                }
-                return expanded;
+            	return generatePrefixes(expanded, cursor, variable, prefix);
             } else {
                 prefix.add(variable);
             }
@@ -256,7 +239,28 @@ public class ADD {
         return expanded;
     }
 
-    /* (non-Javadoc)
+    private static Set<List<String>> generatePrefixes(final Set<List<String>> expanded, final Iterator<String> cursor, final String variable, final List<String> prefix) {
+    	// We must generate two alternative prefixes: one with the
+        // variable in positive form and another with it in negative
+        // form (i.e., omitted).
+        List<String> complementedPrefix = new LinkedList<String>(prefix);
+        String deparenthesized = variable.substring(1, variable.length()-1);
+        prefix.add(deparenthesized);
+        // Then we must expand the rest of the configuration and append
+        // each of the expanded sub-configurations to the alternative prefixes.
+        Collection<List<String>> expandedTail = expandDontCares(cursor);
+        for (List<String> expandedSubconfig : expandedTail) {
+            List<String> positive = new LinkedList<String>(prefix);
+            List<String> complemented = new LinkedList<String>(complementedPrefix);
+            positive.addAll(expandedSubconfig);
+            complemented.addAll(expandedSubconfig);
+            expanded.add(positive);
+            expanded.add(complemented);
+        }
+        return expanded;
+	}
+
+	/* (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
