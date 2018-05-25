@@ -46,40 +46,52 @@ public class SDUtil {
 	 * @param indent the indentation being applied to the output
 	 */
 	private static String printInSequence(Fragment fragment, String indent) {
-	    String message = indent;
-		message += "Lifelines:\n";
+	    String message = printLifelines(fragment, indent);
+	    message += printLifelines(fragment, indent);
+	    
+	    return message;
+	}
+	
+	public static String printLifelines (Fragment fragment, String indent) {
+		String lifeline = indent;
+		lifeline += "Lifelines:\n";
 		for (Lifeline l: fragment.getLifelines()) {
-		    message += indent;
-		    message += l.getName() + "\n";
+		    lifeline += indent;
+		    lifeline += l.getName() + "\n";
 		}
-		message += "\n";
-
-		message += indent;
-		message += "Nodes:\n";
+		lifeline += "\n";
+		
+		return lifeline;
+	}
+	
+	public static String printFragments (Fragment fragment, String indent) {
+		String fragments = indent;
+		fragments += "Nodes:\n";
 		for (Node n: fragment.getNodes()) {
-		    message += indent;
+		    fragments += indent;
 			if (n.getClass().equals(Fragment.class)) {
 				Fragment f = (Fragment)n;
-				message += printFragment(f);
-				message += printInSequence(f, indent+"\t");
+				fragments += printFragment(f);
+				fragments += printInSequence(f, indent+"\t");
 			} else if (n.getClass().equals(Operand.class)) {
 				Operand o = (Operand)n;
-				message += "Guard = " + o.getGuard() + "\n";
+				fragments += "Guard = " + o.getGuard() + "\n";
 				for (Node n1: o.getNodes()) {
-				    message += indent;
+				    fragments += indent;
 					if (n1.getClass().equals(Message.class)) {
-					    message += printMessage((Message)n1);
+					    fragments += printMessage((Message)n1);
 					} else if (n1.getClass().equals(Fragment.class)) {
 						Fragment f = (Fragment)n1;
-						message += printFragment(f);
-						message += printInSequence((Fragment)n1, indent+'\t');
+						fragments += printFragment(f);
+						fragments += printInSequence((Fragment)n1, indent+'\t');
 					}
 				}
 			} else if (n.getClass().equals(Message.class)) {
-			    message += printMessage((Message)n);
+			    fragments += printMessage((Message)n);
 			}
 		}
-		return message;
+		
+		return fragments;
 	}
 
 	/**
