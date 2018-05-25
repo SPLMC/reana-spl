@@ -75,22 +75,28 @@ public class SDUtil {
 				fragments += printInSequence(f, indent+"\t");
 			} else if (n.getClass().equals(Operand.class)) {
 				Operand o = (Operand)n;
-				fragments += "Guard = " + o.getGuard() + "\n";
-				for (Node n1: o.getNodes()) {
-				    fragments += indent;
-					if (n1.getClass().equals(Message.class)) {
-					    fragments += printMessage((Message)n1);
-					} else if (n1.getClass().equals(Fragment.class)) {
-						Fragment f = (Fragment)n1;
-						fragments += printFragment(f);
-						fragments += printInSequence((Fragment)n1, indent+'\t');
-					}
-				}
+				fragments += "Guard = " + o.getGuard() + "\n";	
+				fragments = returnEqualsOperand(fragments, o, indent);
 			} else if (n.getClass().equals(Message.class)) {
 			    fragments += printMessage((Message)n);
 			}
 		}
 		
+		return fragments;
+	}
+	
+	public static String returnEqualsOperand(String fragments, Operand o, String indent){
+	
+		for (Node n1: o.getNodes()) {
+		    fragments += indent;
+			if (n1.getClass().equals(Message.class)) {
+			    fragments += printMessage((Message)n1);
+			} else if (n1.getClass().equals(Fragment.class)) {
+				Fragment f = (Fragment)n1;
+				fragments += printFragment(f);
+				fragments += printInSequence((Fragment)n1, indent+'\t');
+			}
+		}
 		return fragments;
 	}
 
