@@ -17,7 +17,7 @@ public class SDUtil {
 	 * Prints to STDOUT the information of a SD Fragment
 	 * @param f a MagicDraw UML SD fragment
 	 */
-	private static String printFragment(Fragment f) {
+	static String printFragment(Fragment f) {
 		if (f.getName() != null && !f.getName().isEmpty()) {
 			return "[Fragment = " + f.getName() + "]\n";
 		} else {
@@ -30,7 +30,7 @@ public class SDUtil {
 	 * Prints to STDOUT the information of a SD Message
 	 * @param m a MagicDraw UML SD message
 	 */
-	private static String printMessage(Message m) {
+	static String printMessage(Message m) {
 		return "[" + m.getName() + "]: "
 				+ m.getSender().getName() + "->"
 				+ m.getReceiver().getName() + " (" + m.getType()
@@ -45,7 +45,7 @@ public class SDUtil {
 	 * @param sd the Magic Draw UML Sequence Diagram
 	 * @param indent the indentation being applied to the output
 	 */
-	private static String printInSequence(Fragment fragment, String indent) {
+	static String printInSequence(Fragment fragment, String indent) {
 	    String message = printLifelines(fragment, indent);
 	    message += printLifelines(fragment, indent);
 	    
