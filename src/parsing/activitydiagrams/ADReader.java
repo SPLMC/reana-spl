@@ -236,18 +236,22 @@ public class ADReader {
 				Activity activity = this.activitiesByID.get(elements.item(s).getAttributes()
 						.getNamedItem("xmi:id").getTextContent());
 				NodeList tmpEdges = elements.item(s).getChildNodes();
-				for (int t = 0; t < tmpEdges.getLength(); t++) {
-					if (tmpEdges.item(t).getNodeName().equals("incoming")) {
-						activity.addIncoming(this.edgesByID.get(tmpEdges.item(t).getAttributes()
-								.getNamedItem("xmi:idref").getTextContent()));
-					} else if (tmpEdges.item(t).getNodeName().equals("outgoing")) {
-						activity.addOutgoing(this.edgesByID.get(tmpEdges.item(t).getAttributes()
-								.getNamedItem("xmi:idref").getTextContent()));
-					}
-				}
+				edgesInfo(activity, tmpEdges);
 			}
 		}
 		orderActivities();
+	}
+
+	private void edgesInfo(Activity activity, NodeList tmpEdges) {
+		for (int t = 0; t < tmpEdges.getLength(); t++) {
+			if (tmpEdges.item(t).getNodeName().equals("incoming")) {
+				activity.addIncoming(this.edgesByID.get(tmpEdges.item(t).getAttributes()
+						.getNamedItem("xmi:idref").getTextContent()));
+			} else if (tmpEdges.item(t).getNodeName().equals("outgoing")) {
+				activity.addOutgoing(this.edgesByID.get(tmpEdges.item(t).getAttributes()
+						.getNamedItem("xmi:idref").getTextContent()));
+			}
+		}
 	}
 
 
