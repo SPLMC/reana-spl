@@ -86,19 +86,10 @@ public class ADReader {
 	 * @throws InvalidTagException
 	 */
 	public void retrieveActivities() throws InvalidTagException {
-		org.w3c.dom.Node ad;
+		//org.w3c.dom.Node ad;
 		List<org.w3c.dom.Node> adList = new ArrayList<org.w3c.dom.Node>();
 		NodeList nodes = this.doc.getElementsByTagName("packagedElement");
-		for (int i = 0; i < nodes.getLength(); i++) {
-			if (nodes.item(i).getAttributes().getNamedItem("xmi:type") != null) {
-				String xmiType = nodes.item(i).getAttributes().getNamedItem("xmi:type")
-						.getTextContent();
-				if (xmiType != null && xmiType.equals("uml:Activity")) {
-					ad = nodes.item(i);
-					adList.add(ad);
-				}
-			}
-		}
+		updateList(adList, nodes);
 
 		if ((this.index + 1) == adList.size())
 			this.next = false;
@@ -110,6 +101,27 @@ public class ADReader {
 		NodeList elements = node.getChildNodes();
 		this.activities = new ArrayList<Activity>();
 
+		activitiesAttributes(elements);
+		resetActivitiesByID();
+		retrieveEdges(node);
+		solveActivities(node);
+	}
+
+	private void updateList(List<org.w3c.dom.Node> adList, NodeList nodes) {
+		org.w3c.dom.Node ad;
+		for (int i = 0; i < nodes.getLength(); i++) {
+			if (nodes.item(i).getAttributes().getNamedItem("xmi:type") != null) {
+				String xmiType = nodes.item(i).getAttributes().getNamedItem("xmi:type")
+						.getTextContent();
+				if (xmiType != null && xmiType.equals("uml:Activity")) {
+					ad = nodes.item(i);
+					adList.add(ad);
+				}
+			}
+		}
+	}
+
+	private void activitiesAttributes(NodeList elements) {
 		for (int s = 0; s < elements.getLength(); s++) {
 			if (elements.item(s).getNodeName().equals("node")) {
 				Activity tmp;
@@ -132,9 +144,6 @@ public class ADReader {
 				this.activities.add(tmp);
 			}
 		}
-		resetActivitiesByID();
-		retrieveEdges(node);
-		solveActivities(node);
 	}
 
 	public void resetActivitiesByID() {
@@ -178,18 +187,7 @@ public class ADReader {
 						.getNamedItem("target").getTextContent()));
 
 				NodeList infoNodes = elements.item(s).getChildNodes();
-				for (int i = 0; i < infoNodes.getLength(); i++) {
-					if (infoNodes.item(i).getNodeName().equals("guard")) {
-						NodeList guardNodes = infoNodes.item(i).getChildNodes();
-						for (int j = 0; j < guardNodes.getLength(); j++) {
-							if (guardNodes.item(j).getNodeName().equals("body")) {
-								tmp.setGuard(guardNodes.item(j).getTextContent());
-								break;
-							}
-						}
-						break;
-					}
-				}
+				nodeInfo(tmp, infoNodes);
 				ProbabilityEnergyTimeProfile profile = ProbabilityEnergyTimeProfileReader.retrieveProbEnergyTime(tmp.getId(), this.doc);
 				if (profile.hasProbability()) {
 				    tmp.setProbability(profile.getProbability());
@@ -198,6 +196,21 @@ public class ADReader {
 			}
 		}
 		resetEdgesByID();
+	}
+
+	private void nodeInfo(Edge tmp, NodeList infoNodes) {
+		for (int i = 0; i < infoNodes.getLength(); i++) {
+			if (infoNodes.item(i).getNodeName().equals("guard")) {
+				NodeList guardNodes = infoNodes.item(i).getChildNodes();
+				for (int j = 0; j < guardNodes.getLength(); j++) {
+					if (guardNodes.item(j).getNodeName().equals("body")) {
+						tmp.setGuard(guardNodes.item(j).getTextContent());
+						break;
+					}
+				}
+				break;
+			}
+		}
 	}
 
 	public void resetEdgesByID() {
@@ -265,6 +278,13 @@ public class ADReader {
 			}
 		}
 
+		i = targetOrder(i, queue);
+	}
+
+	private int targetOrder(int i, Queue<Activity> queue) {
+		int j;
+		Activity target;
+		Activity temp;
 		while (!queue.isEmpty()) {
 			for (Edge e : queue.element().getOutgoing()) {
 				target = e.getTarget();
@@ -289,5 +309,6 @@ public class ADReader {
 			}
 			queue.poll(); // tira o primeiro da fila
 		}
+		return i;
 	}
 }
