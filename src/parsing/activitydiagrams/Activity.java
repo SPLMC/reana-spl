@@ -21,19 +21,38 @@ public class Activity {
 		this.incoming = new ArrayList<Edge>();
 		this.outgoing = new ArrayList<Edge>();
 		this.ordered = false;
-		if ("uml:InitialNode".equals(type)) {
-			this.type = ActivityType.INITIAL_NODE;
-		} else if ("uml:ActivityFinalNode".equals(type)) {
-			this.type = ActivityType.FINAL_NODE;
-		} else if ("uml:CallBehaviorAction".equals(type)) {
-			this.type = ActivityType.CALL;
-		} else if ("uml:DecisionNode".equals(type)) {
-			this.type = ActivityType.DECISION;
-		} else if ("uml:MergeNode".equals(type)) {
-			this.type = ActivityType.MERGE;
-		}
+		activityType(type);
 	}
 
+	private void activityType(String type) {
+		final String initial_node = "uml:InitialNode";
+		final String final_node = "uml:ActivityFinalNode";
+		final String call_behavior_action = "uml:CallBehaviorAction";
+		final String decision_node = "uml:DecisionNode";
+		final String merge_node = "uml:MergeNode";
+		
+		switch(type){
+			case initial_node:
+				this.type = ActivityType.INITIAL_NODE;
+				break;
+			case final_node:
+				this.type = ActivityType.FINAL_NODE;
+				break;
+			case call_behavior_action:
+				this.type = ActivityType.CALL;
+				break;
+			case decision_node:
+				this.type = ActivityType.DECISION;
+				break;
+			case merge_node:
+				this.type = ActivityType.MERGE;
+				break;
+			default:
+				break;
+		}
+
+	}
+	
 	public String getName() {
 		return name;
 	}
