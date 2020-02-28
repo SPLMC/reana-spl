@@ -48,10 +48,11 @@ public class FeatureBasedFirstPhase {
         // Expressions can be calculated concurrently...
         Stream<RDGNode> expressionStream = (concurrencyStrategy == ConcurrencyStrategy.PARALLEL) ? nodes.parallelStream()
                                                                                                  : nodes.stream();
+        
         Map<String, String> expressionsByNode = expressionStream
             .collect(Collectors.toMap(RDGNode::getId,
                                       this::getReliabilityExpression));
-
+        //System.out.println(expressionsByNode);
         // ... but then we need to recover ordering information
         // so that we can format the response accordingly.
         return nodes.stream()

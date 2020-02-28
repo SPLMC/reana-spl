@@ -90,6 +90,8 @@ public class FeatureFamilyBasedAnalyzer {
         timeCollector.startTimer(CollectibleTimers.MODEL_CHECKING_TIME);
         // Alpha_v
         List<Component<String>> expressions = firstPhase.getReliabilityExpressions(dependencies, concurrencyStrategy);
+        
+        System.out.println(expressions);
         timeCollector.stopTimer(CollectibleTimers.MODEL_CHECKING_TIME);
 
         timeCollector.startTimer(CollectibleTimers.EXPRESSION_SOLVING_TIME);

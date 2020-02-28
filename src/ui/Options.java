@@ -87,11 +87,12 @@ class Options {
                                  + "FEATURE_PRODUCT (feature-product-based); "
                                  + "FAMILY (family-based); "
                                  + "FAMILY_PRODUCT (family-product-based); "
-                                 + "PRODUCT (product-based).")
+                                 + "PRODUCT (product-based)"
+                                 + "FEATURE_FAMILY_PRODUCT (feature-family-product-based).")
                 .withRequiredArg()
                 .ofType(AnalysisStrategy.class)
                 .defaultsTo(AnalysisStrategy.FEATURE_FAMILY)
-                .describedAs("FEATURE_FAMILY | FEATURE_PRODUCT | FAMILY | FAMILY_PRODUCT | PRODUCT");
+                .describedAs("FEATURE_FAMILY | FEATURE_PRODUCT | FAMILY | FAMILY_PRODUCT | PRODUCT | FEATURE_FAMILY_PRODUCT");
 
         OptionSpec<Void> helpOption = optionParser
                 .accepts("help")

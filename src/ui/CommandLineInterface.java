@@ -149,7 +149,10 @@ public class CommandLineInterface {
                                           rdgRoot,
                                           validConfigs);
             break;
-        case FEATURE_FAMILY:
+        case FEATURE_FAMILY_PRODUCT:
+        	results = evaluateFFPReliability(analyzer, rdgRoot, options);
+        	
+        break;	
         default:
             results = evaluateFeatureFamilyBasedReliability(analyzer,
                                                             rdgRoot,
@@ -172,6 +175,23 @@ public class CommandLineInterface {
         OUTPUT.println("Family-wide reliability decision diagram dumped at " + dotOutput);
         return results;
     }
+    
+    private static IReliabilityAnalysisResults evaluateFFPReliability(Analyzer analyzer, RDGNode rdgRoot, Options options) {
+        IReliabilityAnalysisResults results = null;
+        String dotOutput = "feature-family-product-reliability.dot";
+        try {
+            analyzer.setPruningStrategy(PruningStrategyFactory.createPruningStrategy(options.getPruningStrategy()));
+            results = analyzer.evaluateFFPReliability(rdgRoot, null);
+        } catch (CyclicRdgException e) {
+            LOGGER.severe("Cyclic dependency detected in RDG.");
+            LOGGER.log(Level.SEVERE, e.toString(), e);
+            System.exit(2);
+        }
+        OUTPUT.println("Family-wide reliability decision diagram dumped at " + dotOutput);
+        return results;
+    }
+    
+    
 
     private static IReliabilityAnalysisResults evaluateReliability(BiFunction<RDGNode, Stream<Collection<String>>, IReliabilityAnalysisResults> analyzer,
                                                                    RDGNode rdgRoot,
