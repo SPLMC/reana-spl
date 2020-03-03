@@ -26,7 +26,7 @@ import tool.stats.ITimeCollector;
 import expressionsolver.ExpressionSolver;
 
 /**
- * Orchestrator of feature-product-based analyses.
+ * Orchestrator of feature-product-based analysis.
  */
 public class FeatureProductBasedAnalyzer {
     private static final Logger LOGGER = Logger.getLogger(FeatureProductBasedAnalyzer.class.getName());
@@ -87,6 +87,8 @@ public class FeatureProductBasedAnalyzer {
                                                                                   concurrencyStrategy);
 
         timeCollector.stopTimer(CollectibleTimers.EXPRESSION_SOLVING_TIME);
+        System.out.println("Feature-Product ******");
+
         return new MapBasedReliabilityResults(results);
     }
 

@@ -5,5 +5,6 @@ public enum AnalysisStrategy {
     FEATURE_PRODUCT,
     PRODUCT,
     FAMILY,
-    FAMILY_PRODUCT
+    FAMILY_PRODUCT, 
+    FEATURE_FAMILY_PRODUCT
 }
