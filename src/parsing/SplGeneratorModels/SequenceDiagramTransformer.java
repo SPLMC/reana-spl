@@ -50,15 +50,35 @@ public class SequenceDiagramTransformer {
 			target = f.createSuccessState();
 			return target;
 		} else {
-			e = sde.removeFirst();
+			//e = sde.removeFirst();
+			e = sde.getFirst();
+			LinkedList<SequenceDiagramElement> newList = new LinkedList<SequenceDiagramElement>();
+			for (int i = 1; i < sde.size(); i++) {
+				newList.push(sde.get(i));
+			}
 			sdClass = e.getClass().getSimpleName();
-			target = transformSdElement(sde, f);
+			target = transformSdElement(newList, f);
 		}
 
 		source = f.createState();
-
+		
+		if (e.getName().contentEquals("n16")) {
+			System.out.println("Temperature");
+		}
+		
+		if (e.getName().contentEquals("n13")) {
+			System.out.println("PulseRate");
+		}
+		
+	/*	if (e.getName().contentEquals("n6")) {
+			System.out.println("Mais um memory");
+		}
+*/
 		switch (sdClass) {
 		case "Message":
+			if (this.root.getId().contentEquals("n5")) {
+				System.out.println("Passou message n5");
+			}
 			Message m = (Message) e;
 			double reliability = new BigDecimal(m.getProbability()).setScale(4, BigDecimal.ROUND_HALF_UP).doubleValue();
 			double complement = new BigDecimal(1-m.getProbability()).setScale(4, BigDecimal.ROUND_HALF_UP).doubleValue();
@@ -67,8 +87,8 @@ public class SequenceDiagramTransformer {
 						Double.toString(reliability));
 				// PARAM doesn't like 0-valued transitions... it SEGFAULTs without mercy!
 				if (Double.compare(reliability, 1.0) != 0) {
-				    f.createTransition(source, f.getErrorState(), m.getName(),
-				            Double.toString(complement));
+					f.createTransition(source, f.getErrorState(), m.getName(),
+							Double.toString(complement));
 				}
 			}
 			break;
@@ -79,7 +99,11 @@ public class SequenceDiagramTransformer {
 				SequenceDiagram onlySD = fr.getSequenceDiagrams()
 						.getFirst();
 				SequenceDiagramTransformer transformer = new SequenceDiagramTransformer();
-				RDGNode dependencyNode = transformer.transformSD(onlySD, RDGNode.getNextId());
+				if (onlySD.getGuardCondition().contentEquals("Memory")) {
+					System.out.println("Mais um memory");
+				}
+				//RDGNode dependencyNode = transformer.transformSD(onlySD, RDGNode.getNextId());
+				RDGNode dependencyNode = transformer.transformSD(onlySD, onlySD.getName());
 				this.root.addDependency(dependencyNode);
 
 				String dependencyName = dependencyNode.getId();
