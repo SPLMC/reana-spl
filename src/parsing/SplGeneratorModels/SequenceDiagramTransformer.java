@@ -62,18 +62,6 @@ public class SequenceDiagramTransformer {
 
 		source = f.createState();
 		
-		if (e.getName().contentEquals("n16")) {
-			System.out.println("Temperature");
-		}
-		
-		if (e.getName().contentEquals("n13")) {
-			System.out.println("PulseRate");
-		}
-		
-	/*	if (e.getName().contentEquals("n6")) {
-			System.out.println("Mais um memory");
-		}
-*/
 		switch (sdClass) {
 		case "Message":
 			if (this.root.getId().contentEquals("n5")) {
@@ -99,9 +87,6 @@ public class SequenceDiagramTransformer {
 				SequenceDiagram onlySD = fr.getSequenceDiagrams()
 						.getFirst();
 				SequenceDiagramTransformer transformer = new SequenceDiagramTransformer();
-				if (onlySD.getGuardCondition().contentEquals("Memory")) {
-					System.out.println("Mais um memory");
-				}
 				//RDGNode dependencyNode = transformer.transformSD(onlySD, RDGNode.getNextId());
 				RDGNode dependencyNode = transformer.transformSD(onlySD, onlySD.getName());
 				this.root.addDependency(dependencyNode);
