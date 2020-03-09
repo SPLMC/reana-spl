@@ -149,6 +149,11 @@ public class CommandLineInterface {
                                           rdgRoot,
                                           validConfigs);
             break;
+        case FEATURE_FAMILY_PRODUCT:
+            results = evaluateReliability(analyzer::evaluateFeatureFamilyProductBasedReliability,
+                                          rdgRoot,
+                                          validConfigs);
+            break;
         case FEATURE_FAMILY:
         default:
             results = evaluateFeatureFamilyBasedReliability(analyzer,
@@ -363,50 +368,50 @@ public class CommandLineInterface {
     private static RDGNode model(File umlModels, ITimeCollector timeCollector) throws UnsupportedFragmentTypeException, InvalidTagException, InvalidNumberOfOperandsException, InvalidNodeClassException, InvalidNodeType {
     	String exporter = identifyExporter(umlModels);
     	IModelerAPI modeler = null;
-    	
+
     	timeCollector.startTimer(CollectibleTimers.PARSING_TIME);
-    	
+
     	switch (exporter) {
 		case "MagicDraw":
 			modeler = new DiagramAPI(umlModels);
-			
+
 			break;
 
-		case "SplGenerator": 
+		case "SplGenerator":
 			modeler = new SplGeneratorModelingAPI(umlModels);
 			break;
-			
+
 		default:
 			break;
 		}
 
-        
+
     	RDGNode result = modeler.transform();
     	timeCollector.stopTimer(CollectibleTimers.PARSING_TIME);
 
         return result;
     }
-    
+
     /**
      * @author andlanna
-     * This method's role is to identify which behavioral model exporter was 
+     * This method's role is to identify which behavioral model exporter was
      * used for generating activity and sequence diagrams.
      * @param umlModels - the XML file representing the SPL's activity and sequence diagrams.
      * @return a string with the name of the exporter
      */
 	private static String identifyExporter(File umlModels) {
-		String answer = null; 
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance(); 
-		
+		String answer = null;
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
 		DocumentBuilder builder;
-		Document doc = null; 
+		Document doc = null;
 		try {
 			builder = factory.newDocumentBuilder();
 			doc = builder.parse(umlModels);
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			e.printStackTrace();
-		} 
-		
+		}
+
 		NodeList nodes = doc.getElementsByTagName("xmi:exporter");
 		if (nodes.getLength() > 0) {
 			Element e = (Element) nodes.item(0);
@@ -416,8 +421,8 @@ public class CommandLineInterface {
 		} else {
 			answer = "SplGenerator";
 		}
-		
-		
+
+
 		return answer;
 	}
 

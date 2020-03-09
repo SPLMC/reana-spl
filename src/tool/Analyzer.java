@@ -21,6 +21,7 @@ import tool.analyzers.strategies.FamilyProductBasedAnalyzer;
 import tool.analyzers.strategies.FeatureFamilyBasedAnalyzer;
 import tool.analyzers.strategies.FeatureProductBasedAnalyzer;
 import tool.analyzers.strategies.ProductBasedAnalyzer;
+import tool.analyzers.strategies.FeatureFamilyProductBasedAnalyzer;
 import tool.stats.IFormulaCollector;
 import tool.stats.ITimeCollector;
 import tool.stats.NoopFormulaCollector;
@@ -52,6 +53,7 @@ public class Analyzer {
     ProductBasedAnalyzer productBasedAnalyzerImpl;
     FamilyBasedAnalyzer familyBasedAnalyzerImpl;
     FamilyProductBasedAnalyzer familyProductBasedAnalyzerImpl;
+    FeatureFamilyProductBasedAnalyzer featureFamilyProductBasedAnalyzerImpl;
 
     /**
      * Creates an Analyzer which will follow the logical rules
@@ -112,6 +114,10 @@ public class Analyzer {
                                                                this.timeCollector,
                                                                this.formulaCollector);
         this.familyProductBasedAnalyzerImpl = new FamilyProductBasedAnalyzer(this.jadd,
+                                                                             this.modelChecker,
+                                                                             this.timeCollector,
+                                                                             this.formulaCollector);
+        this.featureFamilyProductBasedAnalyzerImpl = new FeatureFamilyProductBasedAnalyzer(this.jadd,
                                                                              this.modelChecker,
                                                                              this.timeCollector,
                                                                              this.formulaCollector);
@@ -229,6 +235,10 @@ public class Analyzer {
      */
     public IReliabilityAnalysisResults evaluateFamilyProductBasedReliability(RDGNode node, Stream<Collection<String>> configurations) throws CyclicRdgException, UnknownFeatureException {
         return familyProductBasedAnalyzerImpl.evaluateReliability(node, configurations, this.concurrencyStrategy);
+    }
+
+    public IReliabilityAnalysisResults evaluateFeatureFamilyProductBasedReliability(RDGNode node, Stream<Collection<String>> configurations) throws CyclicRdgException, UnknownFeatureException {
+        return featureFamilyProductBasedAnalyzerImpl.evaluateReliability(node, configurations, this.concurrencyStrategy);
     }
 
     /**
