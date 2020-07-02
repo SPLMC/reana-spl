@@ -113,14 +113,6 @@ public class FeatureFamilyBasedAnalyzer {
         System.out.println ("++++++ Sigma Time: " + sigmaTime + " ++++++");
 
         timeCollector.stopTimer(CollectibleTimers.EXPRESSION_SOLVING_TIME);
-        
-     // Removendo a raiz e o capture da lista
-//        previousAnalysis.remove(node.getId());
-//        previousAnalysis.remove("Capture");
-        
-        /*if (dotOutput != null) {
-            generateDotFile(result, dotOutput);
-        }*/
 
         return new ADDReliabilityResults(result);
     }
@@ -154,18 +146,6 @@ public class FeatureFamilyBasedAnalyzer {
         System.out.println ("++++++ Sigma Time: " + sigmaTime + " ++++++");
 
         timeCollector.stopTimer(CollectibleTimers.EXPRESSION_SOLVING_TIME);
-
-//        for(String s : previousAnalysis.keySet()){
-//            generateDotFile(previousAnalysis.get(s), s + ".dot");
-//        }
-
-        // Removendo a raiz e o capture da lista
-//        previousAnalysis.remove(node.getId());
-//        previousAnalysis.remove("Capture");
-
-//        if (true) {
-//            generateDotFile(result, "saida.dot");
-//        }
 
         return new ADDReliabilityResults(result);
     }

@@ -100,7 +100,7 @@ public class CommandLineInterface {
             RDGNode rdgRoot = buildRDG(options);
             memoryCollector.takeSnapshot("after model parsing");
 
-            Analyzer analyzer = makeAnalyzer(options, 0);
+            Analyzer analyzer = makeAnalyzer(options, 0, reusePreviousAnalysis.NOT_REUSE_PREVIOUS_ANALYSIS);
             Stream<Collection<String>> targetConfigurations = getTargetConfigurations(options, analyzer);
 
             memoryCollector.takeSnapshot("before evaluation");
@@ -128,21 +128,13 @@ public class CommandLineInterface {
             long totalRunningTime = System.currentTimeMillis() - startTime;
             OUTPUT.println("Total analysis time: " +  totalAnalysisTime + " ms");
             OUTPUT.println("Total running time: " +  totalRunningTime + " ms");
-            
-            File directory = new File("BSN");
-            if(!directory.exists())
-                directory.mkdir();
 
-            for(String i : previousAnalysis.keySet()){
-                analyzer.getJadd().dumpADD(i, previousAnalysis.get(i),"BSN/" + i + ".add");
-            }
-            
-            analyzer.getJadd().writeVariableStore("variableStore.add");
+            storeAnalysis(previousAnalysis, analyzer, "BSN", "variableStore.add");
 
         }
 
         else{
-            Analyzer analyzer = makeAnalyzer(options, evolutionNumber, true);
+            Analyzer analyzer = makeAnalyzer(options, evolutionNumber,reusePreviousAnalysis.REUSE_PREVIOUS_ANALYSIS);
 
             evolveModel(options, analyzer, evolutionNumber, previousAnalysis);
 
@@ -196,9 +188,6 @@ public class CommandLineInterface {
                                                                    rdgRoot,
                                                                    options,
                                                                    idFragment, previousAnalysis);
-      /*for(String s : previousAnalysis.keySet()){
-          analyzer.getfeatureFamilyBasedAnalyzerImpl().generateDotFile(previousAnalysis.get(s), s + ".dot");
-      }*/
       return results;
     }
 
@@ -252,35 +241,32 @@ public class CommandLineInterface {
      * @param options
      * @return
      */
-    private static Analyzer makeAnalyzer(Options options, int i) {
-        File featureModelFile = new File(options.getFeatureModelFilePath());
-        String featureModel = readFeatureModel(featureModelFile);
+     private static Analyzer makeAnalyzer(Options options, int i, reusePreviousAnalysis evolvecase) {
+         File featureModelFile = new File(options.getFeatureModelFilePath());
+         String featureModel = readFeatureModel(featureModelFile);
 
-        String paramPath = options.getParamPath();
-        Analyzer analyzer = new Analyzer(featureModel,
-                                         paramPath,
-                                         timeCollector,
-                                         formulaCollector,
-                                         modelCollector,
-                                         i);
-        analyzer.setConcurrencyStrategy(options.getConcurrencyStrategy());
-        return analyzer;
-    }
-
-    private static Analyzer makeAnalyzer(Options options, int i, boolean evol) {
-        File featureModelFile = new File(options.getFeatureModelFilePath());
-        String featureModel = readFeatureModel(featureModelFile);
-
-        String paramPath = options.getParamPath();
-        Analyzer analyzer = new Analyzer(featureModel,
-                                         paramPath,
-                                         timeCollector,
-                                         formulaCollector,
-                                         modelCollector,
-                                         i,
-                                         evol);
-        analyzer.setConcurrencyStrategy(options.getConcurrencyStrategy());
-        return analyzer;
+         String paramPath = options.getParamPath();
+         if(evolvecase == reusePreviousAnalysis.REUSE_PREVIOUS_ANALYSIS){
+             Analyzer analyzer = new Analyzer(featureModel,
+                                              paramPath,
+                                              timeCollector,
+                                              formulaCollector,
+                                              modelCollector,
+                                              i,
+                                              true);
+             analyzer.setConcurrencyStrategy(options.getConcurrencyStrategy());
+             return analyzer;
+         }
+         else{
+             Analyzer analyzer = new Analyzer(featureModel,
+                                              paramPath,
+                                              timeCollector,
+                                              formulaCollector,
+                                              modelCollector,
+                                              i);
+             analyzer.setConcurrencyStrategy(options.getConcurrencyStrategy());
+             return analyzer;
+         }
     }
 
     /**
@@ -325,14 +311,12 @@ public class CommandLineInterface {
     private static void printAnalysisResults(Map<Boolean, List<Collection<String>>> splitConfigs, IReliabilityAnalysisResults familyReliability) {
         OUTPUT.println("Configurations:");
         OUTPUT.println("=========================================");
-//        String[] teste = {"ACC", "Temperature", "SQLite", "ECG", "TEMP", "Storage", "Oxygenation", "Monitoring"};
         List<Collection<String>> validConfigs = splitConfigs.get(true);
         // Ordered report
         validConfigs.sort((c1, c2) -> c1.toString().compareTo(c2.toString()));
         for (Collection<String> validConfig: validConfigs) {
             try {
                 String[] configurationAsArray = validConfig.toArray(new String[validConfig.size()]);
-//                OUTPUT.println(familyReliability.getResult(teste).toString());
                 printSingleConfiguration(validConfig.toString(),
                                          familyReliability.getResult(configurationAsArray));
             } catch (UnknownFeatureException e) {
@@ -525,7 +509,7 @@ public class CommandLineInterface {
 
       long totalAnalysisTime = System.currentTimeMillis() - analysisStartTime;
       memoryCollector.takeSnapshot("after evaluation");
-      
+
       if (!options.hasSuppressReport()) {
           Map<Boolean, List<Collection<String>>> splitConfigs = getTargetConfigurations(options, analyzer)
                   .collect(Collectors.partitioningBy(analyzer::isValidConfiguration));
@@ -537,26 +521,8 @@ public class CommandLineInterface {
       }
       OUTPUT.println("Total analysis time: " +  totalAnalysisTime + " ms\n\n");
 
-      File directory = new File("BSN");
-      if(!directory.exists())
-          directory.mkdir();
+      storeAnalysis(analysis, analyzer, "BSN", "variableStore.add");
 
-      for(String i : analysis.keySet()){
-          analyzer.getJadd().dumpADD(i, analysis.get(i),"BSN/" + i + ".add");
-      }
-      
-      analyzer.getJadd().writeVariableStore("variableStore.add");
-      
-  }
-
-  private static String getFmFileName(int numberOfEvolutions){
-      return ("fmBSN" + String.valueOf(numberOfEvolutions) + ".txt");
-	  //return ("tank" + String.valueOf(numberOfEvolutions) + ".txt");
-  }
-
-  private static String getUmlFileName(int numberOfEvolutions){
-      return ("bmBSN" + String.valueOf(numberOfEvolutions) + ".xml");
-      //return ("tank" + String.valueOf(numberOfEvolutions) + ".xml");
   }
 
   private static String getFragmentId(int numberOfEvolutions){
@@ -580,5 +546,28 @@ public class CommandLineInterface {
       }
 
       return previousAnalysis;
+  }
+
+  public static void storeAnalysis(Map<String, ADD> analysis, Analyzer analyzer, String directoryName, String variableStoreName){
+      File directory = new File(directoryName);
+      if(!directory.exists())
+          directory.mkdir();
+
+      //deleting ADDs from others analysis
+      File previousADDs[] = directory.listFiles();
+      for(File file : previousADDs){
+          file.delete();
+      }
+
+      //storing ADDs and variables
+      for(String i : analysis.keySet()){
+          analyzer.getJadd().dumpADD(i, analysis.get(i),directoryName + "/" + i + ".add");
+      }
+
+      analyzer.getJadd().writeVariableStore(variableStoreName);
+  }
+
+  public enum reusePreviousAnalysis{
+      REUSE_PREVIOUS_ANALYSIS, NOT_REUSE_PREVIOUS_ANALYSIS;
   }
 }

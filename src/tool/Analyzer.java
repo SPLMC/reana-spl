@@ -68,7 +68,7 @@ public class Analyzer {
     public Analyzer(String featureModel, String paramPath, ITimeCollector timeCollector, IFormulaCollector formulaCollector, IModelCollector modelCollector, int i) {
         this(new JADD(), featureModel, paramPath, timeCollector, formulaCollector, modelCollector, i);
     }
-    
+
     public Analyzer(String featureModel, String paramPath, ITimeCollector timeCollector, IFormulaCollector formulaCollector, IModelCollector modelCollector, int i, boolean evol) {
         this(new JADD("variableStore.add"), featureModel, paramPath, timeCollector, formulaCollector, modelCollector, i);
     }
@@ -95,11 +95,8 @@ public class Analyzer {
         this.featureModel = expressionSolver.encodeFormula(featureModel);
         // The feature model contains all used variables, so we expect to
         // be able to generate an optimal ordering right after parsing it.
-//        long reorderTime = System.currentTimeMillis();
-//        if (i < 10)
-//        	jadd.reorderVariables();
-//        reorderTime = System.currentTimeMillis() - reorderTime;
-//        System.out.println ("++++++ Reorder Time: " + reorderTime + " ++++++");
+        if (i < 10)
+        	jadd.reorderVariables();
 
         this.timeCollector = (timeCollector != null) ? timeCollector : new NoopTimeCollector();
         this.formulaCollector = (formulaCollector != null) ? formulaCollector : new NoopFormulaCollector();
@@ -263,7 +260,7 @@ public class Analyzer {
     public FeatureFamilyBasedAnalyzer getfeatureFamilyBasedAnalyzerImpl(){
         return this.featureFamilyBasedAnalyzerImpl;
     }
-    
+
     public JADD getJadd() {
     	return this.jadd;
     }
