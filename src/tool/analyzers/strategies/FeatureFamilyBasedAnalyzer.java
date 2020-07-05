@@ -118,16 +118,15 @@ public class FeatureFamilyBasedAnalyzer {
 //        previousAnalysis.remove(node.getId());
 //        previousAnalysis.remove("Capture");
         
-        /*if (dotOutput != null) {
-            generateDotFile(result, dotOutput);
-        }*/
+//        if (dotOutput != null) {
+//            generateDotFile(result, dotOutput);
+//        }
 
         return new ADDReliabilityResults(result);
     }
 
     public IReliabilityAnalysisResults evaluateReliabilityWithEvolution(RDGNode node, ConcurrencyStrategy concurrencyStrategy, String dotOutput, String idFragment, Map<String, ADD> previousAnalysis) throws CyclicRdgException {
     	 System.out.println ("***** Entrou no evaluateRealiabilityWithEvolution *****");
-
     	List<RDGNode> dependencies = getModifiedNodes(node, idFragment, previousAnalysis);
     	long alphaTime = System.currentTimeMillis();
         timeCollector.startTimer(CollectibleTimers.MODEL_CHECKING_TIME);
@@ -154,9 +153,11 @@ public class FeatureFamilyBasedAnalyzer {
         System.out.println ("++++++ Sigma Time: " + sigmaTime + " ++++++");
 
         timeCollector.stopTimer(CollectibleTimers.EXPRESSION_SOLVING_TIME);
-
+        if (dotOutput != null) {
+            generateDotFile(result, dotOutput);
+        }
 //        for(String s : previousAnalysis.keySet()){
-//            generateDotFile(previousAnalysis.get(s), s + ".dot");
+//            generateDotFile(previousAnalysis.get(s), s + "E.dot");
 //        }
 
         // Removendo a raiz e o capture da lista

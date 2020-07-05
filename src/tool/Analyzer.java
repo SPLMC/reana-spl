@@ -96,7 +96,7 @@ public class Analyzer {
         // The feature model contains all used variables, so we expect to
         // be able to generate an optimal ordering right after parsing it.
 //        long reorderTime = System.currentTimeMillis();
-//        if (i < 10)
+//        if (i < 21)
 //        	jadd.reorderVariables();
 //        reorderTime = System.currentTimeMillis() - reorderTime;
 //        System.out.println ("++++++ Reorder Time: " + reorderTime + " ++++++");

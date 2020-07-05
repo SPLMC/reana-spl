@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SplBehavioralModel name="3">
+  <ActivityDiagram name="AD_SPL_0">
+    <Elements>
+      <ActivityDiagramElement name="Start node" type="StartNode"/>
+      <ActivityDiagramElement name="End node" type="EndNode"/>
+      <ActivityDiagramElement name="Reconfiguration" type="Activity">
+        <RepresentedBy seqDiagName="Reconfiguration"/>
+      </ActivityDiagramElement>
+      <ActivityDiagramElement name="DecisionNode_0" type="DecisionNode"/>
+      <ActivityDiagramElement name="QoSChange" type="Activity">
+        <RepresentedBy seqDiagName="QoSChange"/>
+      </ActivityDiagramElement>
+      <ActivityDiagramElement name="Situation" type="Activity">
+        <RepresentedBy seqDiagName="Situation"/>
+      </ActivityDiagramElement>
+      <ActivityDiagramElement name="Capture" type="Activity">
+        <RepresentedBy seqDiagName="Capture"/>
+        <RepresentedBy seqDiagName="Capture"/>
+      </ActivityDiagramElement>
+      <ActivityDiagramElement name="Capture" type="Activity">
+        <RepresentedBy seqDiagName="Capture"/>
+        <RepresentedBy seqDiagName="Capture"/>
+      </ActivityDiagramElement>
+    </Elements>
+    <Transitions>
+      <Transition name="" probability="0.5" source="DecisionNode_0" target="End node"/>
+      <Transition name="Reconfiguration" probability="1.0" source="Reconfiguration" target="End node"/>
+      <Transition name="" probability="0.5" source="DecisionNode_0" target="Reconfiguration"/>
+      <Transition name="QoSChange" probability="1.0" source="QoSChange" target="DecisionNode_0"/>
+      <Transition name="Situation" probability="1.0" source="Situation" target="QoSChange"/>
+      <Transition name="Capture" probability="1.0" source="Capture" target="Situation"/>
+      <Transition name="" probability="1.0" source="Start node" target="Capture"/>
+    </Transitions>
+  </ActivityDiagram>
+  <SequenceDiagrams>
+    <SequenceDiagram guard="true" name="QoSChange">
+      <Message name="" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="asynchronous" />
+      <Message name="getQoSRequired" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="returnQoSRequired" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="notifyChange" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="replyNotify" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+    </SequenceDiagram>
+    <SequenceDiagram guard="Memory" name="n6">
+      <Message name="persist" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="persistReply" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+    </SequenceDiagram>
+    <SequenceDiagram guard="ACC" name="n3">
+      <Message name="sendPacket" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="sendSituation(packetSituation)" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="replySituation" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+    </SequenceDiagram>
+    <SequenceDiagram guard="Oxygenation" name="n7">
+      <Message name="register" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="replyRegister" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="asynchronous" />
+      <Message name="persist" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Fragment name="n5" type="optional">
+        <RepresentedBy seqDiagName="n5" />
+      </Fragment>
+      <Fragment name="n6" type="optional">
+        <RepresentedBy seqDiagName="n6" />
+      </Fragment>
+      <Message name="persistReply" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="asynchronous" />
+      <Message name="replySendSituation(Oxygenation)" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="replySendSituation" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+    </SequenceDiagram>
+    <SequenceDiagram guard="true" name="Situation">
+      <Fragment name="n4" type="optional">
+        <RepresentedBy seqDiagName="n4" />
+      </Fragment>
+      <Fragment name="n7" type="optional">
+        <RepresentedBy seqDiagName="n7" />
+      </Fragment>
+      <Fragment name="n10" type="optional">
+        <RepresentedBy seqDiagName="n10" />
+      </Fragment>
+      <Fragment name="n13" type="optional">
+        <RepresentedBy seqDiagName="n13" />
+      </Fragment>
+      <Fragment name="n16" type="optional">
+        <RepresentedBy seqDiagName="n16" />
+      </Fragment>
+    </SequenceDiagram>
+    <SequenceDiagram guard="Position" name="n10">
+      <Message name="register" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="replyRegister" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="asynchronous" />
+      <Message name="persist" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Fragment name="n5" type="optional">
+        <RepresentedBy seqDiagName="n5" />
+      </Fragment>
+      <Fragment name="n6" type="optional">
+        <RepresentedBy seqDiagName="n6" />
+      </Fragment>
+      <Message name="persistReply" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="asynchronous" />
+      <Message name="replySendSituation(Position)" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="replySendSituation" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+    </SequenceDiagram>
+    <SequenceDiagram guard="true" name="Reconfiguration">
+      <Message name="getQoSRequired" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="replyQoSRequired" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="searchNewConfig" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="replyNewConfig" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="calculateQoS" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="replyQoS" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="configure" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="replyConfigure" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+    </SequenceDiagram>
+    <SequenceDiagram guard="Fall" name="n4">
+      <Message name="register" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="replyRegister" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="asynchronous" />
+      <Message name="persist" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Fragment name="n5" type="optional">
+        <RepresentedBy seqDiagName="n5" />
+      </Fragment>
+      <Fragment name="n6" type="optional">
+        <RepresentedBy seqDiagName="n6" />
+      </Fragment>
+      <Message name="persistReply" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="asynchronous" />
+      <Message name="replySendSituation(Fall)" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="replySendSituation" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+    </SequenceDiagram>
+    <SequenceDiagram guard="ECG" name="n0">
+      <Message name="" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="asynchronous" />
+      <Message name="sendSituation(packetSituation)" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="replySituation" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+    </SequenceDiagram>
+    <SequenceDiagram guard="TEMP" name="n2">
+      <Message name="" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="asynchronous" />
+      <Message name="sendSituation(packetSituation)" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="replySituation" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+    </SequenceDiagram>
+    <SequenceDiagram guard="SPO2" name="n1">
+      <Message name="" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="asynchronous" />
+      <Message name="sendSituation(packetSituation)" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="replySituation" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+    </SequenceDiagram>
+    <SequenceDiagram guard="PulseRate" name="n13">
+      <Message name="register" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="replyRegister" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="asynchronous" />
+      <Message name="persist" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Fragment name="n5" type="optional">
+        <RepresentedBy seqDiagName="n5" />
+      </Fragment>
+      <Fragment name="n6" type="optional">
+        <RepresentedBy seqDiagName="n6" />
+      </Fragment>
+      <Message name="persistReply" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="asynchronous" />
+      <Message name="replySendSituation(PulseRate)" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="replySendSituation" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+    </SequenceDiagram>
+    <SequenceDiagram guard="Temperature" name="n16">
+      <Message name="register" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="replyRegister" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="asynchronous" />
+      <Message name="persist" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Fragment name="n5" type="optional">
+        <RepresentedBy seqDiagName="n5" />
+      </Fragment>
+      <Fragment name="n6" type="optional">
+        <RepresentedBy seqDiagName="n6" />
+      </Fragment>
+      <Message name="persistReply" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="asynchronous" />
+      <Message name="replySendSituation(Temperature)" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="replySendSituation" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+    </SequenceDiagram>
+    <SequenceDiagram guard="SQLite" name="n5">
+      <Message name="persist" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+      <Message name="persistReply" probability="0.999" source="Mock lifeline" target="Lifeline_0" type="synchronous" />
+    </SequenceDiagram>
+    <SequenceDiagram guard="true" name="Capture">
+      <Fragment name="Fragment_2" type="optional">
+        <RepresentedBy seqDiagName="SD_5"/>
+      </Fragment>
+      <Fragment name="Fragment_4" type="optional">
+        <RepresentedBy seqDiagName="SD_8"/>
+      </Fragment>
+      <Fragment name="n0" type="optional">
+        <RepresentedBy seqDiagName="n0"/>
+      </Fragment>
+      <Fragment name="Fragment_0" type="optional">
+        <RepresentedBy seqDiagName="SD_2"/>
+      </Fragment>
+      <Fragment name="n1" type="optional">
+        <RepresentedBy seqDiagName="n1"/>
+      </Fragment>
+      <Fragment name="n2" type="optional">
+        <RepresentedBy seqDiagName="n2"/>
+      </Fragment>
+      <Fragment name="n3" type="optional">
+        <RepresentedBy seqDiagName="n3"/>
+      </Fragment>
+      <Message name="" probability="1.0" source="Mock lifeline" target="Lifeline_0" type="asynchronous"/>
+    </SequenceDiagram>
+    <SequenceDiagram guard="o_2" name="SD_5">
+      <Message name="T22" probability="0.9953" source="Lifeline3" target="Lifeline2" type="synchronous"/>
+      <Message name="T23" probability="0.9922" source="Lifeline2" target="Lifeline3" type="synchronous"/>
+      <Message name="T24" probability="0.9941" source="Lifeline3" target="Lifeline5" type="synchronous"/>
+      <Message name="T25" probability="0.9964" source="Lifeline5" target="Lifeline4" type="synchronous"/>
+      <Message name="T26" probability="0.9922" source="Lifeline4" target="Lifeline3" type="synchronous"/>
+      <Message name="T27" probability="0.9951" source="Lifeline3" target="Lifeline1" type="synchronous"/>
+      <Message name="T28" probability="0.9946" source="Lifeline1" target="Lifeline0" type="synchronous"/>
+      <Message name="T29" probability="0.9922" source="Lifeline0" target="Lifeline3" type="synchronous"/>
+      <Message name="T30" probability="0.9922" source="Lifeline3" target="Lifeline3" type="synchronous"/>
+      <Message name="T31" probability="0.9922" source="Lifeline3" target="Lifeline3" type="synchronous"/>
+    </SequenceDiagram>
+    <SequenceDiagram guard="o_3" name="SD_8">
+      <Message name="T22" probability="0.9966" source="Lifeline0" target="Lifeline1" type="synchronous"/>
+      <Message name="T23" probability="0.9909" source="Lifeline1" target="Lifeline5" type="synchronous"/>
+      <Message name="T24" probability="0.9972" source="Lifeline5" target="Lifeline4" type="synchronous"/>
+      <Message name="T25" probability="0.9972" source="Lifeline4" target="Lifeline4" type="synchronous"/>
+      <Message name="T26" probability="0.9916" source="Lifeline4" target="Lifeline3" type="synchronous"/>
+      <Message name="T27" probability="0.9972" source="Lifeline3" target="Lifeline4" type="synchronous"/>
+      <Message name="T28" probability="0.9916" source="Lifeline4" target="Lifeline3" type="synchronous"/>
+      <Message name="T29" probability="0.9988" source="Lifeline3" target="Lifeline0" type="synchronous"/>
+      <Message name="T30" probability="0.9997" source="Lifeline0" target="Lifeline2" type="synchronous"/>
+      <Message name="T31" probability="0.9916" source="Lifeline2" target="Lifeline3" type="synchronous"/>
+    </SequenceDiagram>
+    <SequenceDiagram guard="o_1" name="SD_2">
+      <Message name="T22" probability="0.994" source="Lifeline3" target="Lifeline1" type="synchronous"/>
+      <Message name="T23" probability="0.9984" source="Lifeline1" target="Lifeline5" type="synchronous"/>
+      <Message name="T24" probability="0.9964" source="Lifeline5" target="Lifeline4" type="synchronous"/>
+      <Message name="T25" probability="0.9907" source="Lifeline4" target="Lifeline2" type="synchronous"/>
+      <Message name="T26" probability="0.9964" source="Lifeline2" target="Lifeline4" type="synchronous"/>
+      <Message name="T27" probability="0.9926" source="Lifeline4" target="Lifeline3" type="synchronous"/>
+      <Message name="T28" probability="0.9926" source="Lifeline3" target="Lifeline3" type="synchronous"/>
+      <Message name="T29" probability="0.9926" source="Lifeline3" target="Lifeline3" type="synchronous"/>
+      <Message name="T30" probability="0.9984" source="Lifeline3" target="Lifeline5" type="synchronous"/>
+      <Message name="T31" probability="0.9926" source="Lifeline5" target="Lifeline3" type="synchronous"/>
+    </SequenceDiagram>
+    <Lifelines>
+      <Lifeline name="Lifeline_0" reliability="1.0"/>
+      <Lifeline name="Lifeline4" reliability="0.9972"/>
+      <Lifeline name="Lifeline3" reliability="0.9916"/>
+      <Lifeline name="Mock lifeline" reliability="0.999"/>
+      <Lifeline name="Lifeline1" reliability="0.9966"/>
+      <Lifeline name="Lifeline0" reliability="0.9988"/>
+      <Lifeline name="Lifeline3" reliability="0.9916"/>
+      <Lifeline name="Lifeline5" reliability="0.9909"/>
+      <Lifeline name="Lifeline0" reliability="0.9988"/>
+      <Lifeline name="Lifeline1" reliability="0.9966"/>
+      <Lifeline name="Lifeline5" reliability="0.9909"/>
+      <Lifeline name="Lifeline_1" reliability="0.999"/>
+      <Lifeline name="Lifeline4" reliability="0.9972"/>
+      <Lifeline name="Lifeline2" reliability="0.9997"/>
+      <Lifeline name="Lifeline2" reliability="0.9997"/>
+    </Lifelines>
+    <Fragments>
+      <Fragment name="n6" type="optional">
+        <RepresentedBy seqDiagName="n6"/>
+      </Fragment>
+      <Fragment name="Fragment_4" type="optional">
+        <RepresentedBy seqDiagName="SD_8"/>
+      </Fragment>
+      <Fragment name="n0" type="optional">
+        <RepresentedBy seqDiagName="n0"/>
+      </Fragment>
+      <Fragment name="n13" type="optional">
+        <RepresentedBy seqDiagName="n13"/>
+      </Fragment>
+      <Fragment name="n2" type="optional">
+        <RepresentedBy seqDiagName="n2"/>
+      </Fragment>
+      <Fragment name="n1" type="optional">
+        <RepresentedBy seqDiagName="n1"/>
+      </Fragment>
+      <Fragment name="n4" type="optional">
+        <RepresentedBy seqDiagName="n4"/>
+      </Fragment>
+      <Fragment name="Fragment_2" type="optional">
+        <RepresentedBy seqDiagName="SD_5"/>
+      </Fragment>
+      <Fragment name="n16" type="optional">
+        <RepresentedBy seqDiagName="n16"/>
+      </Fragment>
+      <Fragment name="n5" type="optional">
+        <RepresentedBy seqDiagName="n5"/>
+      </Fragment>
+      <Fragment name="Fragment_0" type="optional">
+        <RepresentedBy seqDiagName="SD_2"/>
+      </Fragment>
+      <Fragment name="n10" type="optional">
+        <RepresentedBy seqDiagName="n10"/>
+      </Fragment>
+      <Fragment name="n7" type="optional">
+        <RepresentedBy seqDiagName="n7"/>
+      </Fragment>
+      <Fragment name="n3" type="optional">
+        <RepresentedBy seqDiagName="n3"/>
+      </Fragment>
+    </Fragments>
+  </SequenceDiagrams>
+</SplBehavioralModel>

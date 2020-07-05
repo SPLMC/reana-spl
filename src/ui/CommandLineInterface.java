@@ -129,12 +129,12 @@ public class CommandLineInterface {
             OUTPUT.println("Total analysis time: " +  totalAnalysisTime + " ms");
             OUTPUT.println("Total running time: " +  totalRunningTime + " ms");
             
-            File directory = new File("BSN");
+            File directory = new File("ADDS");
             if(!directory.exists())
                 directory.mkdir();
 
             for(String i : previousAnalysis.keySet()){
-                analyzer.getJadd().dumpADD(i, previousAnalysis.get(i),"BSN/" + i + ".add");
+                analyzer.getJadd().dumpADD(i, previousAnalysis.get(i),"ADDS/" + i + ".add");
             }
             
             analyzer.getJadd().writeVariableStore("variableStore.add");
@@ -497,7 +497,7 @@ public class CommandLineInterface {
 	}
 
 	private static void evolveModel(Options options, Analyzer analyzer, int numberOfEvolutions, Map<String, ADD> previousAnalysis){
-      Map<String, ADD> analysis = getPreviousAnalysis(analyzer.getJadd(), "BSN");
+      Map<String, ADD> analysis = getPreviousAnalysis(analyzer.getJadd(), "ADDS");
 
       LogManager logManager = LogManager.getLogManager();
       try {
@@ -523,7 +523,6 @@ public class CommandLineInterface {
                                                                                        getFragmentId(numberOfEvolutions),
                                                                                        analysis);
 
-      long totalAnalysisTime = System.currentTimeMillis() - analysisStartTime;
       memoryCollector.takeSnapshot("after evaluation");
       
       if (!options.hasSuppressReport()) {
@@ -535,17 +534,18 @@ public class CommandLineInterface {
       if (options.hasStatsEnabled()) {
           printStats(OUTPUT, familyReliability, rdgRoot);
       }
-      OUTPUT.println("Total analysis time: " +  totalAnalysisTime + " ms\n\n");
 
-      File directory = new File("BSN");
+      File directory = new File("ADDS");
       if(!directory.exists())
           directory.mkdir();
 
       for(String i : analysis.keySet()){
-          analyzer.getJadd().dumpADD(i, analysis.get(i),"BSN/" + i + ".add");
+          analyzer.getJadd().dumpADD(i, analysis.get(i),"ADDS/" + i + ".add");
       }
       
       analyzer.getJadd().writeVariableStore("variableStore.add");
+      long totalAnalysisTime = System.currentTimeMillis() - analysisStartTime;
+      OUTPUT.println("Total analysis time: " +  totalAnalysisTime + " ms\n\n");
       
   }
 
@@ -576,7 +576,7 @@ public class CommandLineInterface {
       File previousADDs[] = directory.listFiles();
       for(File file : previousADDs) {
         String fileName = file.getName();
-        previousAnalysis.put(fileName.substring(0, fileName.length() - 4), jadd.readADDpreviousAnalysis("BSN/" + fileName));
+        previousAnalysis.put(fileName.substring(0, fileName.length() - 4), jadd.readADDpreviousAnalysis("ADDS/"+fileName));
       }
 
       return previousAnalysis;
