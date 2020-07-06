@@ -49,7 +49,6 @@ public class JADD {
 
         try (Stream<String> stream = Files.lines(Paths.get(tableFileName))) {
             List<List<Object>> tokens = stream.map(line -> parseLine(line)).collect(Collectors.toList());
-            List<Short> indices = tokens.stream().map(list -> (Short) list.get(0)).collect(Collectors.toList());
             List<String> variableNames = tokens.stream().map(list -> (String) list.get(1)).collect(Collectors.toList());
             // TODO: isolate whether the following line has impact on the GC bug.
             variableNames.forEach(this::getVariable);
@@ -72,21 +71,11 @@ public class JADD {
     }
 
     public ADD getVariable(String varName) {
-//    	File directory = new File("BSN/" + varName + ".add");
-
     	if (variableStore.contains(varName)) {
             return variableStore.get(varName);
-//        } else if (directory.exists()) {
-//        	short index = (short) this.variableStore.getNumberOfVariables();
-//        	ADD varADD = (readADD(varName));
-//            variableStore.put(index, varName, varADD);
-//            return varADD;
-        	
         } else {
-//        	short index = (short) this.variableStore.getNumberOfVariables();
             Pointer<DdNode> var = BigcuddLibrary.Cudd_addNewVar(dd);
             ADD varADD = new ADD(dd, var, variableStore);
-//            variableStore.put(index, varName, varADD);
             variableStore.put(var.get().index(), varName, varADD);
             return varADD;
         }
