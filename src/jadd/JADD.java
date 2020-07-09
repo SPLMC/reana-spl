@@ -47,14 +47,9 @@ public class JADD {
                 0);
         IntValuedEnum<Cudd_ReorderingType> method = Cudd_ReorderingType.CUDD_REORDER_SYMM_SIFT;
 
-        try (Stream<String> stream = Files.lines(Paths.get(tableFileName))) {
-            List<List<Object>> tokens = stream.map(line -> parseLine(line)).collect(Collectors.toList());
-            List<String> variableNames = tokens.stream().map(list -> (String) list.get(1)).collect(Collectors.toList());
-            // TODO: isolate whether the following line has impact on the GC bug.
-            variableNames.forEach(this::getVariable);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        List<String> variableNames = VariableStoreIO.readVariableNames(tableFileName);
+        // TODO: isolate whether the following line has impact on the GC bug.
+        variableNames.forEach(this::getVariable);
     }
 
     public ADD makeConstant(double constant) {
@@ -168,7 +163,7 @@ public class JADD {
                                           Pointer.pointerToCStrings(orderedVariableNames), 
                                           null, 
                                           BigcuddLibrary.DDDMP_MODE_TEXT, 
-                                          BigcuddLibrary.Dddmp_VarInfoType.DDDMP_VARIDS, 
+                               ;           BigcuddLibrary.Dddmp_VarInfoType.DDDMP_VARIDS, 
                                           Pointer.pointerToCString(fileName), 
                                           output);
         CUtils.fclose(output);
