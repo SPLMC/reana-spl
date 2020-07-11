@@ -72,21 +72,17 @@ public class JADD {
     }
 
     public ADD getVariable(String varName) {
-//    	File directory = new File("BSN/" + varName + ".add");
+    	File directory = new File("ADDS/" + varName + ".add");
 
     	if (variableStore.contains(varName)) {
             return variableStore.get(varName);
-//        } else if (directory.exists()) {
-//        	short index = (short) this.variableStore.getNumberOfVariables();
-//        	ADD varADD = (readADD(varName));
-//            variableStore.put(index, varName, varADD);
-//            return varADD;
+        } else if (directory.exists()) {
+        	ADD varADD = (readADD(varName+".add"));
+            return varADD;
         	
         } else {
-//        	short index = (short) this.variableStore.getNumberOfVariables();
             Pointer<DdNode> var = BigcuddLibrary.Cudd_addNewVar(dd);
             ADD varADD = new ADD(dd, var, variableStore);
-//            variableStore.put(index, varName, varADD);
             variableStore.put(var.get().index(), varName, varADD);
             return varADD;
         }
@@ -211,9 +207,9 @@ public class JADD {
 
         CUtils.fclose(input);
         ADD readADD = new ADD(dd, node, variableStore);
-        short index = (short) variableStore.getNumberOfVariables();
-        variableStore.put(index, fileName, readADD);
-//        variableStore.put(node.get().index(), fileName, readADD);
+//        short index = (short) variableStore.getNumberOfVariables();
+//        variableStore.put(index, fileName, readADD);
+        variableStore.put(node.get().index(), fileName, readADD);
 //        return new ADD(dd, node, variableStore);
         return readADD;
     }

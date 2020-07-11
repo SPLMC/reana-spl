@@ -95,11 +95,7 @@ public class Analyzer {
         this.featureModel = expressionSolver.encodeFormula(featureModel);
         // The feature model contains all used variables, so we expect to
         // be able to generate an optimal ordering right after parsing it.
-//        long reorderTime = System.currentTimeMillis();
-//        if (i < 21)
-//        	jadd.reorderVariables();
-//        reorderTime = System.currentTimeMillis() - reorderTime;
-//        System.out.println ("++++++ Reorder Time: " + reorderTime + " ++++++");
+        jadd.reorderVariables();
 
         this.timeCollector = (timeCollector != null) ? timeCollector : new NoopTimeCollector();
         this.formulaCollector = (formulaCollector != null) ? formulaCollector : new NoopFormulaCollector();

@@ -114,10 +114,6 @@ public class FeatureFamilyBasedAnalyzer {
 
         timeCollector.stopTimer(CollectibleTimers.EXPRESSION_SOLVING_TIME);
         
-     // Removendo a raiz e o capture da lista
-//        previousAnalysis.remove(node.getId());
-//        previousAnalysis.remove("Capture");
-        
 //        if (dotOutput != null) {
 //            generateDotFile(result, dotOutput);
 //        }
@@ -126,7 +122,7 @@ public class FeatureFamilyBasedAnalyzer {
     }
 
     public IReliabilityAnalysisResults evaluateReliabilityWithEvolution(RDGNode node, ConcurrencyStrategy concurrencyStrategy, String dotOutput, String idFragment, Map<String, ADD> previousAnalysis) throws CyclicRdgException {
-    	 System.out.println ("***** Entrou no evaluateRealiabilityWithEvolution *****");
+    	System.out.println ("***** Evolution aware reliability analysis *****");
     	List<RDGNode> dependencies = getModifiedNodes(node, idFragment, previousAnalysis);
     	long alphaTime = System.currentTimeMillis();
         timeCollector.startTimer(CollectibleTimers.MODEL_CHECKING_TIME);
@@ -143,6 +139,12 @@ public class FeatureFamilyBasedAnalyzer {
                 .collect(Collectors.toList());
         liftTime = System.currentTimeMillis() - liftTime;
         System.out.println ("++++++ Lift Time: " + liftTime + " ++++++");
+        
+        long reorderTime = System.currentTimeMillis();
+        jadd.reorderVariables();
+        reorderTime = System.currentTimeMillis() - reorderTime;
+        System.out.println ("++++++ Reorder Time: " + reorderTime + " ++++++");
+        
         // Sigma_v
         long sigmaTime = System.currentTimeMillis();
 
@@ -153,21 +155,17 @@ public class FeatureFamilyBasedAnalyzer {
         System.out.println ("++++++ Sigma Time: " + sigmaTime + " ++++++");
 
         timeCollector.stopTimer(CollectibleTimers.EXPRESSION_SOLVING_TIME);
-        if (dotOutput != null) {
-            generateDotFile(result, dotOutput);
-        }
+        
+        
 //        for(String s : previousAnalysis.keySet()){
-//            generateDotFile(previousAnalysis.get(s), s + "E.dot");
+//            generateDotFile(previousAnalysis.get(s), s + "E1pos.dot");
 //        }
-
-        // Removendo a raiz e o capture da lista
-//        previousAnalysis.remove(node.getId());
-//        previousAnalysis.remove("Capture");
-
+        
 //        if (true) {
-//            generateDotFile(result, "saida.dot");
+//        	generateDotFile(result, "saida6.dot");
 //        }
 
+        
         return new ADDReliabilityResults(result);
     }
 

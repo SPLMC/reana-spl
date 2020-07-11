@@ -92,10 +92,12 @@ public class Component<T> {
                                             IsPresent<A, P> isPresent,
                                             DerivationFunction<P, A, V> derive,
                                             Map<String, V> derivedModels) {
+    	long nodeTime = System.currentTimeMillis();
         P presence = isPresent.apply(component);
         V derived = derive.apply(presence, component.getAsset(), derivedModels);
         derivedModels.put(component.getId(), derived);
-        derivedModels.put(component.presenceCondition, derived);
+        nodeTime = System.currentTimeMillis() - nodeTime;
+        System.out.println ("Node "+ component.getId() +" deriveSingle: " + nodeTime);
         return derived;
     }
 

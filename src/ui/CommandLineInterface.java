@@ -116,11 +116,11 @@ public class CommandLineInterface {
             long totalAnalysisTime = System.currentTimeMillis() - analysisStartTime;
             memoryCollector.takeSnapshot("after evaluation");
 
-            if (!options.hasSuppressReport()) {
-                Map<Boolean, List<Collection<String>>> splitConfigs = getTargetConfigurations(options, analyzer)
-                        .collect(Collectors.partitioningBy(analyzer::isValidConfiguration));
-                printAnalysisResults(splitConfigs, familyReliability);
-            }
+//            if (!options.hasSuppressReport()) {
+//                Map<Boolean, List<Collection<String>>> splitConfigs = getTargetConfigurations(options, analyzer)
+//                        .collect(Collectors.partitioningBy(analyzer::isValidConfiguration));
+//                printAnalysisResults(splitConfigs, familyReliability);
+//            }
 
             if (options.hasStatsEnabled()) {
                 printStats(OUTPUT, familyReliability, rdgRoot);
@@ -196,9 +196,6 @@ public class CommandLineInterface {
                                                                    rdgRoot,
                                                                    options,
                                                                    idFragment, previousAnalysis);
-      /*for(String s : previousAnalysis.keySet()){
-          analyzer.getfeatureFamilyBasedAnalyzerImpl().generateDotFile(previousAnalysis.get(s), s + ".dot");
-      }*/
       return results;
     }
 
@@ -525,11 +522,11 @@ public class CommandLineInterface {
 
       memoryCollector.takeSnapshot("after evaluation");
       
-      if (!options.hasSuppressReport()) {
-          Map<Boolean, List<Collection<String>>> splitConfigs = getTargetConfigurations(options, analyzer)
-                  .collect(Collectors.partitioningBy(analyzer::isValidConfiguration));
-          printAnalysisResults(splitConfigs, familyReliability);
-      }
+//      if (!options.hasSuppressReport()) {
+//          Map<Boolean, List<Collection<String>>> splitConfigs = getTargetConfigurations(options, analyzer)
+//                  .collect(Collectors.partitioningBy(analyzer::isValidConfiguration));
+//          printAnalysisResults(splitConfigs, familyReliability);
+//      }
 
       if (options.hasStatsEnabled()) {
           printStats(OUTPUT, familyReliability, rdgRoot);
@@ -547,16 +544,6 @@ public class CommandLineInterface {
       long totalAnalysisTime = System.currentTimeMillis() - analysisStartTime;
       OUTPUT.println("Total analysis time: " +  totalAnalysisTime + " ms\n\n");
       
-  }
-
-  private static String getFmFileName(int numberOfEvolutions){
-      return ("fmBSN" + String.valueOf(numberOfEvolutions) + ".txt");
-	  //return ("tank" + String.valueOf(numberOfEvolutions) + ".txt");
-  }
-
-  private static String getUmlFileName(int numberOfEvolutions){
-      return ("bmBSN" + String.valueOf(numberOfEvolutions) + ".xml");
-      //return ("tank" + String.valueOf(numberOfEvolutions) + ".xml");
   }
 
   private static String getFragmentId(int numberOfEvolutions){
