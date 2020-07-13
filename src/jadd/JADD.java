@@ -47,9 +47,15 @@ public class JADD {
                 0);
         IntValuedEnum<Cudd_ReorderingType> method = Cudd_ReorderingType.CUDD_REORDER_SYMM_SIFT;
 
-        List<String> variableNames = VariableStoreIO.readVariableNames(tableFileName);
-        // TODO: isolate whether the following line has impact on the GC bug.
-        variableNames.forEach(this::getVariable);
+        List<String> variableNames = null;
+        try {
+            variableNames = VariableStoreIO.readVariableNames(tableFileName);
+            // TODO: isolate whether the following line has impact on the GC bug.
+            variableNames.forEach(this::getVariable);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     public ADD makeConstant(double constant) {
@@ -163,7 +169,7 @@ public class JADD {
                                           Pointer.pointerToCStrings(orderedVariableNames), 
                                           null, 
                                           BigcuddLibrary.DDDMP_MODE_TEXT, 
-                               ;           BigcuddLibrary.Dddmp_VarInfoType.DDDMP_VARIDS, 
+                                           BigcuddLibrary.Dddmp_VarInfoType.DDDMP_VARIDS, 
                                           Pointer.pointerToCString(fileName), 
                                           output);
         CUtils.fclose(output);
@@ -252,23 +258,4 @@ public class JADD {
             e.printStackTrace();
         }
     }
-
-    private List<Object> parseLine(String line) {
-       String[] split = line.split("\\s+");
-       if (split.length != 3) {
-           return null;
-       }
-
-       Short index = Short.parseShort(split[0]);
-       String variableName = split[1];
-       String fileName = split[2];
-
-       List<Object> tokens = new ArrayList<Object>();
-       tokens.add(0, index);
-       tokens.add(1, variableName);
-       tokens.add(2, fileName);
-
-       return tokens;
-    }
-
 }
