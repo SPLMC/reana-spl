@@ -1,4 +1,0 @@
-Root,Storage,Monitoring,SensorInformation,Sensor,Oxygenation,SPO2,SQLite
-Root,Storage,Monitoring,SensorInformation,Sensor,Oxygenation,SPO2,Memory
-Root,Storage,Monitoring,SensorInformation,Sensor,Oxygenation,ECG,SQLite
-Root,Storage,Monitoring,SensorInformation,Sensor,Oxygenation,SPO2,ECG,SQLite
