@@ -72,14 +72,8 @@ public class JADD {
     }
 
     public ADD getVariable(String varName) {
-    	File directory = new File("ADDS/" + varName + ".add");
-
     	if (variableStore.contains(varName)) {
             return variableStore.get(varName);
-        } else if (directory.exists()) {
-        	ADD varADD = (readADD(varName+".add"));
-            return varADD;
-        	
         } else {
             Pointer<DdNode> var = BigcuddLibrary.Cudd_addNewVar(dd);
             ADD varADD = new ADD(dd, var, variableStore);

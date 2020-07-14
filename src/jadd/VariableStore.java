@@ -142,7 +142,7 @@ public class VariableStore {
                 String addName = name + ".add";
                 ADD add = variables.get(name);
                 pw.printf("%d %s %s\n", key, name, addName);
-                jadd.dumpADD(name, add, addName);
+//                jadd.dumpADD(name, add, addName);
             }
             pw.close();
         }

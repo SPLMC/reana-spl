@@ -60,7 +60,6 @@ import tool.stats.ITimeCollector;
 import ui.stats.StatsCollectorFactory;
 import jadd.ADD;
 import jadd.JADD;
-import tool.analyzers.strategies.FeatureFamilyBasedAnalyzer;
 
 /**
  * Command-line application.
@@ -83,7 +82,7 @@ public class CommandLineInterface {
 
     public static void main(String[] args) throws IOException {
         long startTime = System.currentTimeMillis();
-        Map<String, ADD> previousAnalysis = new HashMap<String, ADD>();
+        Map<String, ADD> analysis = new HashMap<String, ADD>();
         Options options = Options.parseOptions(args);
         int evolutionNumber = Integer.parseInt(options.getFeatureModelFilePath().replaceAll("[^0-9]", ""));
 
@@ -111,16 +110,16 @@ public class CommandLineInterface {
                                                                                  rdgRoot,
                                                                                  validConfigs,
                                                                                  options,
-                                                                                 previousAnalysis);
+                                                                                 analysis);
 
             long totalAnalysisTime = System.currentTimeMillis() - analysisStartTime;
             memoryCollector.takeSnapshot("after evaluation");
 
-//            if (!options.hasSuppressReport()) {
-//                Map<Boolean, List<Collection<String>>> splitConfigs = getTargetConfigurations(options, analyzer)
-//                        .collect(Collectors.partitioningBy(analyzer::isValidConfiguration));
-//                printAnalysisResults(splitConfigs, familyReliability);
-//            }
+            if (!options.hasSuppressReport()) {
+                Map<Boolean, List<Collection<String>>> splitConfigs = getTargetConfigurations(options, analyzer)
+                        .collect(Collectors.partitioningBy(analyzer::isValidConfiguration));
+                printAnalysisResults(splitConfigs, familyReliability);
+            }
 
             if (options.hasStatsEnabled()) {
                 printStats(OUTPUT, familyReliability, rdgRoot);
@@ -129,22 +128,14 @@ public class CommandLineInterface {
             OUTPUT.println("Total analysis time: " +  totalAnalysisTime + " ms");
             OUTPUT.println("Total running time: " +  totalRunningTime + " ms");
             
-            File directory = new File("ADDS");
-            if(!directory.exists())
-                directory.mkdir();
-
-            for(String i : previousAnalysis.keySet()){
-                analyzer.getJadd().dumpADD(i, previousAnalysis.get(i),"ADDS/" + i + ".add");
-            }
-            
-            analyzer.getJadd().writeVariableStore("variableStore.add");
+            persistAnalysis(analyzer, analysis, options.getPersistedAnalysesPath());
 
         }
 
         else{
             Analyzer analyzer = makeAnalyzer(options, evolutionNumber, true);
 
-            evolveModel(options, analyzer, evolutionNumber, previousAnalysis);
+            evolveModel(options, analyzer, evolutionNumber);
 
             long totalRunningTime = System.currentTimeMillis() - startTime;
             OUTPUT.println("Total running time: " +  totalRunningTime + " ms");
@@ -493,8 +484,9 @@ public class CommandLineInterface {
 		return answer;
 	}
 
-	private static void evolveModel(Options options, Analyzer analyzer, int numberOfEvolutions, Map<String, ADD> previousAnalysis){
-      Map<String, ADD> analysis = getPreviousAnalysis(analyzer.getJadd(), "ADDS");
+	private static void evolveModel(Options options, Analyzer analyzer, int numberOfEvolutions){
+	  String persistedAnalysesPath = options.getPersistedAnalysesPath();
+      Map<String, ADD> analysis = getPreviousAnalysis(analyzer.getJadd(), persistedAnalysesPath);
 
       LogManager logManager = LogManager.getLogManager();
       try {
@@ -522,31 +514,35 @@ public class CommandLineInterface {
 
       memoryCollector.takeSnapshot("after evaluation");
       
-//      if (!options.hasSuppressReport()) {
-//          Map<Boolean, List<Collection<String>>> splitConfigs = getTargetConfigurations(options, analyzer)
-//                  .collect(Collectors.partitioningBy(analyzer::isValidConfiguration));
-//          printAnalysisResults(splitConfigs, familyReliability);
-//      }
+      if (!options.hasSuppressReport()) {
+          Map<Boolean, List<Collection<String>>> splitConfigs = getTargetConfigurations(options, analyzer)
+                  .collect(Collectors.partitioningBy(analyzer::isValidConfiguration));
+          printAnalysisResults(splitConfigs, familyReliability);
+      }
 
       if (options.hasStatsEnabled()) {
           printStats(OUTPUT, familyReliability, rdgRoot);
       }
 
-      File directory = new File("ADDS");
-      if(!directory.exists())
-          directory.mkdir();
-
-      for(String i : analysis.keySet()){
-          analyzer.getJadd().dumpADD(i, analysis.get(i),"ADDS/" + i + ".add");
-      }
-      
-      analyzer.getJadd().writeVariableStore("variableStore.add");
+      persistAnalysis(analyzer, analysis, persistedAnalysesPath);
       long totalAnalysisTime = System.currentTimeMillis() - analysisStartTime;
       OUTPUT.println("Total analysis time: " +  totalAnalysisTime + " ms\n\n");
       
   }
 
-  private static String getFragmentId(int numberOfEvolutions){
+    private static void persistAnalysis(Analyzer analyzer, Map<String, ADD> analysis, String persistedAnalysesPath) {
+        File directory = new File(persistedAnalysesPath);
+        if(!directory.exists())
+            directory.mkdir();
+
+        for(String i : analysis.keySet()){
+            analyzer.getJadd().dumpADD(i, analysis.get(i), persistedAnalysesPath + i + ".add");
+        }
+
+        analyzer.getJadd().writeVariableStore("variableStore.add");
+    }
+
+    private static String getFragmentId(int numberOfEvolutions){
       if(numberOfEvolutions == 0)
           return "";
       else
@@ -560,10 +556,11 @@ public class CommandLineInterface {
 
       if(!directory.exists())
           return previousAnalysis;
-      File previousADDs[] = directory.listFiles();
+      File previousADDs[] = directory.listFiles((dir, file) -> file.endsWith(".add"));
       for(File file : previousADDs) {
         String fileName = file.getName();
-        previousAnalysis.put(fileName.substring(0, fileName.length() - 4), jadd.readADDpreviousAnalysis("ADDS/"+fileName));
+          ADD retrievedResult = jadd.readADDpreviousAnalysis(directoryName + fileName);
+          previousAnalysis.put(fileName.substring(0, fileName.length() - 4), retrievedResult);
       }
 
       return previousAnalysis;

@@ -1,5 +1,6 @@
 package ui;
 
+import java.io.File;
 import java.io.IOException;
 
 import joptsimple.OptionParser;
@@ -18,6 +19,7 @@ import tool.analyzers.buildingblocks.ConcurrencyStrategy;
 class Options {
     private String featureModelFilePath;
     private String umlModelsFilePath;
+    private String persistedAnalysesPath;
     private String paramPath;
     private String configuration;
     private String configurationsFilePath;
@@ -40,6 +42,12 @@ class Options {
                 .withRequiredArg()
                 .defaultsTo("BSN/bmBSN0.xml")
                 .describedAs("File");
+        OptionSpec<String> persistedAnalysesOption = optionParser
+                .accepts("persisted-analyses",
+                         "Path where previous analyses can be found and current analysis results are to be persisted")
+                .withRequiredArg()
+                .defaultsTo("ADDS")
+                .describedAs("Directory");
         OptionSpec<String> paramPathOption = optionParser
                 .accepts("param-path",
                          "Path to the parametric model checker (either PARAM or Prism)")
@@ -106,6 +114,7 @@ class Options {
         Options result = new Options();
         result.featureModelFilePath = options.valueOf(featureModelOption);
         result.umlModelsFilePath = options.valueOf(umlModelsOption);
+        result.persistedAnalysesPath = options.valueOf(persistedAnalysesOption);
         result.paramPath = options.valueOf(paramPathOption);
         result.configuration = options.valueOf(configurationOption);
         result.configurationsFilePath = options.valueOf(configurationsFileOption);
@@ -125,6 +134,13 @@ class Options {
 
     public String getUmlModelsFilePath() {
         return umlModelsFilePath;
+    }
+
+    public String getPersistedAnalysesPath() {
+        if (!persistedAnalysesPath.endsWith(File.separator)) {
+            persistedAnalysesPath += File.separator;
+        }
+        return persistedAnalysesPath;
     }
 
     public String getParamPath() {
