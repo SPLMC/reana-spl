@@ -116,9 +116,14 @@ public class CommandLineInterface {
             memoryCollector.takeSnapshot("after evaluation");
 
             if (!options.hasSuppressReport()) {
-                Map<Boolean, List<Collection<String>>> splitConfigs = getTargetConfigurations(options, analyzer)
-                        .collect(Collectors.partitioningBy(analyzer::isValidConfiguration));
-                printAnalysisResults(splitConfigs, familyReliability);
+                if (options.hasPrintAllConfigurations()) {
+                    // This optimizes memory when printing results for all configurations.
+                    basePrintAnalysisResults(familyReliability.getNumberOfResults(), () -> familyReliability.printAllResults(OUTPUT));
+                } else {
+                    Map<Boolean, List<Collection<String>>> splitConfigs = getTargetConfigurations(options, analyzer)
+                            .collect(Collectors.partitioningBy(analyzer::isValidConfiguration));
+                    printAnalysisResults(splitConfigs, familyReliability);
+                }
             }
 
             if (options.hasStatsEnabled()) {
@@ -310,30 +315,33 @@ public class CommandLineInterface {
         }
     }
 
-    private static void printAnalysisResults(Map<Boolean, List<Collection<String>>> splitConfigs, IReliabilityAnalysisResults familyReliability) {
+    private static void basePrintAnalysisResults(int numResults, Runnable printer) {
         OUTPUT.println("Configurations:");
         OUTPUT.println("=========================================");
-//        String[] teste = {"ACC", "Temperature", "SQLite", "ECG", "TEMP", "Storage", "Oxygenation", "Monitoring"};
-        List<Collection<String>> validConfigs = splitConfigs.get(true);
-        // Ordered report
-        validConfigs.sort((c1, c2) -> c1.toString().compareTo(c2.toString()));
-        for (Collection<String> validConfig: validConfigs) {
-            try {
-                String[] configurationAsArray = validConfig.toArray(new String[validConfig.size()]);
-//                OUTPUT.println(familyReliability.getResult(teste).toString());
-                printSingleConfiguration(validConfig.toString(),
-                                         familyReliability.getResult(configurationAsArray));
-            } catch (UnknownFeatureException e) {
-                LOGGER.severe("Unrecognized feature: " + e.getFeatureName());
-                LOGGER.log(Level.SEVERE, e.toString(), e);
-            }
-        }
-        for (Collection<String> invalidConfig: splitConfigs.get(false)) {
-            printSingleConfiguration(invalidConfig.toString(), 0);
-        }
-
+        printer.run();
         OUTPUT.println("=========================================");
-        OUTPUT.println(">>>> Total valid configurations: " + splitConfigs.get(true).size());
+        OUTPUT.println(">>>> Total valid configurations: " + numResults);
+    }
+
+    private static void printAnalysisResults(Map<Boolean, List<Collection<String>>> splitConfigs, IReliabilityAnalysisResults familyReliability) {
+        basePrintAnalysisResults(splitConfigs.get(true).size(), () -> {
+            List<Collection<String>> validConfigs = splitConfigs.get(true);
+            // Ordered report
+            validConfigs.sort((c1, c2) -> c1.toString().compareTo(c2.toString()));
+            for (Collection<String> validConfig: validConfigs) {
+                try {
+                    String[] configurationAsArray = validConfig.toArray(new String[validConfig.size()]);
+                    printSingleConfiguration(validConfig.toString(),
+                            familyReliability.getResult(configurationAsArray));
+                } catch (UnknownFeatureException e) {
+                    LOGGER.severe("Unrecognized feature: " + e.getFeatureName());
+                    LOGGER.log(Level.SEVERE, e.toString(), e);
+                }
+            }
+            for (Collection<String> invalidConfig: splitConfigs.get(false)) {
+                printSingleConfiguration(invalidConfig.toString(), 0);
+            }
+        });
     }
 
     private static void printSingleConfiguration(String configuration, double reliability) {
@@ -515,9 +523,14 @@ public class CommandLineInterface {
       memoryCollector.takeSnapshot("after evaluation");
       
       if (!options.hasSuppressReport()) {
-          Map<Boolean, List<Collection<String>>> splitConfigs = getTargetConfigurations(options, analyzer)
-                  .collect(Collectors.partitioningBy(analyzer::isValidConfiguration));
-          printAnalysisResults(splitConfigs, familyReliability);
+          if (options.hasPrintAllConfigurations()) {
+              // This optimizes memory when printing results for all configurations.
+              basePrintAnalysisResults(familyReliability.getNumberOfResults(), () -> familyReliability.printAllResults(OUTPUT));
+          } else {
+              Map<Boolean, List<Collection<String>>> splitConfigs = getTargetConfigurations(options, analyzer)
+                      .collect(Collectors.partitioningBy(analyzer::isValidConfiguration));
+              printAnalysisResults(splitConfigs, familyReliability);
+          }
       }
 
       if (options.hasStatsEnabled()) {

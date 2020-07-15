@@ -1,5 +1,6 @@
 package jadd;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -362,6 +363,43 @@ public class ADD {
             return BigcuddLibrary.Cudd_addOr(dd, node1, node2);
         }
     };
+
+    public void printEverything(PrintStream output) {
+        Pointer<Integer> dummy = Pointer.allocateInt();
+        // A pointer to a freshly allocated pointer to int.
+        // As Cudd_FirstCube and Cudd_NextCube allocate the returned cubes,
+        // allocating a whole int[] here makes no sense. Thus, we allocate
+        // only the position where the address to the generated cubes are
+        // to be stored.
+        Pointer<Pointer<Integer>> cubePtr = Pointer.pointerToPointer(dummy);
+        // A pointer to a freshly allocated double.
+        Pointer<Double> valuePtr = Pointer.pointerToDouble(0);
+
+        // So let's start the iteration!
+        Pointer<DdGen> generator = BigcuddLibrary.Cudd_FirstCube(dd,
+                                                                 function,
+                                                                 cubePtr,
+                                                                 valuePtr);
+        int numVars = BigcuddLibrary.Cudd_ReadSize(dd);
+
+        while (BigcuddLibrary.Cudd_IsGenEmpty(generator) == 0) {
+            Pointer<Integer> cube = cubePtr.getPointer(Integer.class);
+            int[] presenceVector = cube.getInts(numVars);
+            List<String> configuration = variableStore.fromPresenceVector(presenceVector);
+
+            Collection<List<String>> expandedConfigs = expandDontCares(configuration);
+            for (List<String> config: expandedConfigs) {
+                output.println(config + " --> " + valuePtr.get());
+            }
+
+            BigcuddLibrary.Cudd_NextCube(generator,
+                                         cubePtr,
+                                         valuePtr);
+        }
+        if (generator != null) {
+            BigcuddLibrary.Cudd_GenFree(generator);
+        }
+    }
 
     private class CubeSpliterator extends AbstractSpliterator<Collection<String>> {
 

@@ -24,6 +24,16 @@ public class ADDReliabilityResults implements IReliabilityAnalysisResults {
     }
 
     @Override
+    public void printAllResults(PrintStream output) {
+        results.printEverything(output);
+    }
+
+    @Override
+    public int getNumberOfResults() {
+        return (int) results.getPathsToNonZeroTerminalsCount();
+    }
+
+    @Override
     public void printStats(PrintStream output) {
         int numVariables = results.getVariables().size();
         int numNodes = results.getNodeCount();

@@ -17,6 +17,8 @@ public interface IReliabilityAnalysisResults {
      *      unknown feature.
      */
     public Double getResult(String[] configuration) throws UnknownFeatureException;
+    public void printAllResults(PrintStream output);
+    public int getNumberOfResults();
 
     public void printStats(PrintStream output);
 

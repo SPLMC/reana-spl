@@ -44,6 +44,18 @@ public class MapBasedReliabilityResults implements IReliabilityAnalysisResults {
         return 0.0;
     }
 
+    @Override
+    public void printAllResults(PrintStream output) {
+        for (Map.Entry<Set<String>, Double> result: results.entrySet()) {
+            output.println(result.getKey() + " --> " + result.getValue());
+        }
+    }
+
+    @Override
+    public int getNumberOfResults() {
+        return results.size();
+    }
+
     public synchronized void putResult(List<String> configuration, Double value) {
         Set<String> configurationAsSet = new HashSet<String>(configuration);
         results.put(configurationAsSet, value);
