@@ -158,12 +158,15 @@ public class FeatureFamilyBasedAnalyzer {
         
         
 //        for(String s : previousAnalysis.keySet()){
-//            generateDotFile(previousAnalysis.get(s), s + "E1pos.dot");
+//        	generateDotFile(previousAnalysis.get(s),"DOTS/"+ s + "E4pos.dot");
 //        }
         
 //        if (true) {
 //        	generateDotFile(result, "saida6.dot");
 //        }
+       
+        //remove a raiz
+        previousAnalysis.remove(node.getId());
 
         
         return new ADDReliabilityResults(result);
