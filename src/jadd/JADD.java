@@ -168,4 +168,67 @@ public class JADD {
         
         return new ADD(dd, node, variableStore);
     }
+
+    public ADD[] readADDs(String fileName) {
+        Pointer<?> input = CUtils.fopen(fileName, CUtils.ACCESS_READ);
+
+        Pointer<Pointer<DdNode>> ptr = null;
+        int nRoots = BigcuddLibrary.Dddmp_cuddAddArrayLoad(dd,
+                                              BigcuddLibrary.Dddmp_RootMatchType.DDDMP_ROOT_MATCHLIST,
+                                              null,
+                                              BigcuddLibrary.Dddmp_VarMatchType.DDDMP_VAR_MATCHIDS,
+                                              null,
+                                              null,
+                                              null,
+                                              BigcuddLibrary.DDDMP_MODE_TEXT,
+                                              Pointer.pointerToCString(fileName),
+                                              input,
+                                              Pointer.pointerToPointer(ptr));
+        CUtils.fclose(input);
+        if (nRoots == 0) {
+            return null; // TODO handle this case with an exception
+        }
+
+        ADD[] adds = new ADD[nRoots];
+        for (int i = 0; i < nRoots; i++) {
+            @SuppressWarnings("null")
+            Pointer<DdNode> node = ptr.getPointerAtIndex(i).as(DdNode.class);
+            adds[i] = new ADD(dd, node, variableStore);
+        }
+
+        return adds;
+    }
+
+    public void dumpADD(String name, String[] functionNames, ADD[] adds, String fileName) {
+        Pointer<?> output = CUtils.fopen(fileName, CUtils.ACCESS_WRITE);
+
+        @SuppressWarnings("unchecked")
+        Pointer<DdNode>[] nodes = (Pointer<DdNode>[]) new Pointer[adds.length];
+        int i = 0;
+        for (ADD function : adds) {
+            nodes[i] = function.getUnderlyingNode();
+            i++;
+        }
+        String[] orderedVariableNames = variableStore.getOrderedNames();
+
+        Pointer<Byte> ddname;
+        if (name == null || name.isEmpty()) {
+            ddname = null;
+        } else {
+            ddname = Pointer.pointerToCString(name);
+        }
+
+        BigcuddLibrary.Dddmp_cuddAddArrayStore(dd,
+                                               ddname,
+                                               nodes.length,
+                                               Pointer.pointerToPointers(nodes),
+                                               Pointer.pointerToCStrings(functionNames),
+                                               Pointer.pointerToCStrings(orderedVariableNames),
+                                               null, // auxids
+                                               BigcuddLibrary.DDDMP_MODE_TEXT,
+                                               BigcuddLibrary.Dddmp_VarInfoType.DDDMP_VARIDS, // varinfo
+                                               Pointer.pointerToCString(fileName),
+                                               output);
+    }
+
 }
