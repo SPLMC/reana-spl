@@ -166,7 +166,7 @@ public class JADD {
 
         CUtils.fclose(input);
         
-        return new ADD(dd, node, variableStore);
+        return new ADD(dd, node, variableStore, false);
     }
 
     public ADD[] readADDs(String fileName) {
@@ -193,7 +193,7 @@ public class JADD {
         for (int i = 0; i < nRoots; i++) {
             @SuppressWarnings("null")
             Pointer<DdNode> node = ptr.getPointerAtIndex(i).as(DdNode.class);
-            adds[i] = new ADD(dd, node, variableStore);
+            adds[i] = new ADD(dd, node, variableStore, false);
         }
 
         return adds;
@@ -229,6 +229,11 @@ public class JADD {
                                                BigcuddLibrary.Dddmp_VarInfoType.DDDMP_VARIDS, // varinfo
                                                Pointer.pointerToCString(fileName),
                                                output);
+
+        CUtils.fclose(output);
     }
 
+    public void dumpADD(ADD[] adds, String fileName) {
+        dumpADD(null, null, adds, fileName);
+    }
 }

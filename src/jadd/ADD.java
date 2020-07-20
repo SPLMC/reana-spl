@@ -41,6 +41,16 @@ public class ADD {
         BigcuddLibrary.Cudd_Ref(this.function);
     }
 
+    ADD(Pointer<DdManager> dd, Pointer<DdNode> function, VariableStore variableStore, Boolean ref) {
+        this.dd = dd;
+        this.function = function;
+        this.variableStore = variableStore;
+        if (ref) {
+            BigcuddLibrary.Cudd_Ref(this.function);
+        }
+    }
+    
+
     /**
      * Overriding finalize in order to free CUDD allocated memory.
      */
