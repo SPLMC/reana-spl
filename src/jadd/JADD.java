@@ -1,5 +1,7 @@
 package jadd;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.util.Map;
 
 import org.bridj.IntValuedEnum;
@@ -172,7 +174,8 @@ public class JADD {
     public ADD[] readADDs(String fileName) {
         Pointer<?> input = CUtils.fopen(fileName, CUtils.ACCESS_READ);
 
-        Pointer<Pointer<DdNode>> ptr = null;
+        // Pointer<Pointer<DdNode>> ptr = Pointer.allocatePointer(DdNode.class);
+        Pointer<Pointer<Pointer<DdNode>>> ptr = Pointer.pointerToPointer(Pointer.pointerToPointer(null));
         int nRoots = BigcuddLibrary.Dddmp_cuddAddArrayLoad(dd,
                                               BigcuddLibrary.Dddmp_RootMatchType.DDDMP_ROOT_MATCHLIST,
                                               null,
@@ -183,16 +186,16 @@ public class JADD {
                                               BigcuddLibrary.DDDMP_MODE_TEXT,
                                               Pointer.pointerToCString(fileName),
                                               input,
-                                              Pointer.pointerToPointer(ptr));
+                                              ptr);
         CUtils.fclose(input);
         if (nRoots == 0) {
             return null; // TODO handle this case with an exception
         }
 
+        Pointer<Pointer<DdNode>> roots = ptr.get();
         ADD[] adds = new ADD[nRoots];
         for (int i = 0; i < nRoots; i++) {
-            @SuppressWarnings("null")
-            Pointer<DdNode> node = ptr.getPointerAtIndex(i).as(DdNode.class);
+            Pointer<DdNode> node = roots.getPointerAtIndex(i).as(DdNode.class);
             adds[i] = new ADD(dd, node, variableStore, false);
         }
 
