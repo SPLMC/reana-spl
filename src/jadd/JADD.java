@@ -168,7 +168,7 @@ public class JADD {
 
         CUtils.fclose(input);
         
-        return new ADD(dd, node, variableStore, false);
+        return new ADD(dd, node, variableStore);
     }
 
     public ADD[] readADDs(String fileName) {
@@ -196,7 +196,7 @@ public class JADD {
         ADD[] adds = new ADD[nRoots];
         for (int i = 0; i < nRoots; i++) {
             Pointer<DdNode> node = roots.getPointerAtIndex(i).as(DdNode.class);
-            adds[i] = new ADD(dd, node, variableStore, false);
+            adds[i] = new ADD(dd, node, variableStore);
         }
 
         return adds;
