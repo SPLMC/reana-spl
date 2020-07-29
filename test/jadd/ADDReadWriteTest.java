@@ -13,6 +13,7 @@ public class ADDReadWriteTest {
 
     JADD jadd;
     private static final String DIR_PREFIX = "/tmp/";
+    private static final int N = 1000;
 
     @Before
     public void setUp() throws Exception {
@@ -52,7 +53,7 @@ public class ADDReadWriteTest {
     }
 
     @Test
-    public void testComplexADDWriteRead() {
+    public void testFunctionADDWriteRead() {
         Random rand = new Random();
         ADD a = jadd.makeConstant(rand.nextDouble());
         ADD b = jadd.makeConstant(rand.nextDouble());
@@ -67,5 +68,30 @@ public class ADDReadWriteTest {
         
         ADD fRead = jadd.readADD(filename);
         Assert.assertEquals(f, fRead);
+    }
+    
+    @Test
+    public void testLargeADDWriteRead() {
+       ADD[] functions = new ADD[N]; 
+       ADD[] variables = new ADD[N];
+       
+       ADD t = jadd.makeConstant(1.0);
+       ADD e = jadd.makeConstant(0.5);
+       
+       variables[0] = jadd.getVariable("v0");
+       functions[0] = variables[0].ifThenElse(t, e);
+       
+       for (int i = 1; i < N; i++) {
+          variables[i] = jadd.getVariable("v" + i)
+                             .ifThenElse(functions[i-1], t);
+          functions[i] = functions[i-1].times(variables[i]);
+       }
+      
+       String filename = DIR_PREFIX + "add-" + N + ".add";
+       jadd.dumpADD(functions[N-1], filename);
+       
+       ADD functionRead = jadd.readADD(filename);
+       
+       Assert.assertEquals(functions[N-1], functionRead);
     }
 }
