@@ -516,19 +516,24 @@ public class CommandLineInterface {
       Stream<Collection<String>> validConfigs = targetConfigurations.filter(analyzer::isValidConfiguration);
       
       JADD jadd = analyzer.getJadd();
-      System.out.println("Previous variable order:");
+
+      OUTPUT.print("Previous variable order: ");
+
       List<String> previousVariableOrder = jadd.readVariableOrder("variableorder.add");
-      System.out.println(previousVariableOrder);
-      System.out.println("New variable order:");
+
+      OUTPUT.println(previousVariableOrder);
+
       List<String> variableOrder = jadd.getNewVariableOrder(previousVariableOrder);
-      System.out.println(variableOrder);
+
+      OUTPUT.print("New variable order: ");
+      OUTPUT.println(variableOrder);
+
       try {
 		jadd.setVariableOrder(variableOrder.toArray(new String[0]));
-	} catch (UnrecognizedVariableException e) {
+      } catch (UnrecognizedVariableException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
-	}
-
+      }
 
       IReliabilityAnalysisResults familyReliability = evaluateReliabilityWithEvolution(analyzer,
                                                                                        rdgRoot,
