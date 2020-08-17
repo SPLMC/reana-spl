@@ -141,7 +141,7 @@ public class FeatureFamilyBasedAnalyzer {
         System.out.println ("++++++ Lift Time: " + liftTime + " ++++++");
         
         long reorderTime = System.currentTimeMillis();
-        jadd.reorderVariables();
+        // jadd.reorderVariables();
         reorderTime = System.currentTimeMillis() - reorderTime;
         System.out.println ("++++++ Reorder Time: " + reorderTime + " ++++++");
         

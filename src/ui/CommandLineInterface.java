@@ -60,6 +60,7 @@ import tool.stats.ITimeCollector;
 import ui.stats.StatsCollectorFactory;
 import jadd.ADD;
 import jadd.JADD;
+import jadd.UnrecognizedVariableException;
 
 /**
  * Command-line application.
@@ -513,6 +514,22 @@ public class CommandLineInterface {
       memoryCollector.takeSnapshot("before evaluation");
       long analysisStartTime = System.currentTimeMillis();
       Stream<Collection<String>> validConfigs = targetConfigurations.filter(analyzer::isValidConfiguration);
+      
+      JADD jadd = analyzer.getJadd();
+      System.out.println("Previous variable order:");
+      List<String> previousVariableOrder = jadd.readVariableOrder("variableorder.add");
+      System.out.println(previousVariableOrder);
+      System.out.println("New variable order:");
+      List<String> variableOrder = jadd.getNewVariableOrder(previousVariableOrder);
+      System.out.println(variableOrder);
+      try {
+		jadd.setVariableOrder(variableOrder.toArray(new String[0]));
+	} catch (UnrecognizedVariableException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+
+
       IReliabilityAnalysisResults familyReliability = evaluateReliabilityWithEvolution(analyzer,
                                                                                        rdgRoot,
                                                                                        validConfigs,
@@ -553,6 +570,7 @@ public class CommandLineInterface {
         }
 
         analyzer.getJadd().writeVariableStore("variableStore.add");
+        analyzer.getJadd().writeVariableOrder("variableorder.add");
     }
 
     private static String getFragmentId(int numberOfEvolutions){
