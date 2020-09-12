@@ -60,6 +60,7 @@ import tool.stats.ITimeCollector;
 import ui.stats.StatsCollectorFactory;
 import jadd.ADD;
 import jadd.JADD;
+import jadd.UnrecognizedVariableException;
 
 /**
  * Command-line application.
@@ -115,16 +116,16 @@ public class CommandLineInterface {
             long totalAnalysisTime = System.currentTimeMillis() - analysisStartTime;
             memoryCollector.takeSnapshot("after evaluation");
 
-            if (!options.hasSuppressReport()) {
-                if (options.hasPrintAllConfigurations()) {
-                    // This optimizes memory when printing results for all configurations.
-                    basePrintAnalysisResults(familyReliability.getNumberOfResults(), () -> familyReliability.printAllResults(OUTPUT));
-                } else {
-                    Map<Boolean, List<Collection<String>>> splitConfigs = getTargetConfigurations(options, analyzer)
-                            .collect(Collectors.partitioningBy(analyzer::isValidConfiguration));
-                    printAnalysisResults(splitConfigs, familyReliability);
-                }
-            }
+//            if (!options.hasSuppressReport()) {
+//                if (options.hasPrintAllConfigurations()) {
+//                    // This optimizes memory when printing results for all configurations.
+//                    basePrintAnalysisResults(familyReliability.getNumberOfResults(), () -> familyReliability.printAllResults(OUTPUT));
+//                } else {
+//                    Map<Boolean, List<Collection<String>>> splitConfigs = getTargetConfigurations(options, analyzer)
+//                            .collect(Collectors.partitioningBy(analyzer::isValidConfiguration));
+//                    printAnalysisResults(splitConfigs, familyReliability);
+//                }
+//            }
 
             if (options.hasStatsEnabled()) {
                 printStats(OUTPUT, familyReliability, rdgRoot);
@@ -139,7 +140,6 @@ public class CommandLineInterface {
 
         else{
             Analyzer analyzer = makeAnalyzer(options, evolutionNumber, true);
-
             evolveModel(options, analyzer, evolutionNumber);
 
             long totalRunningTime = System.currentTimeMillis() - startTime;
@@ -493,10 +493,33 @@ public class CommandLineInterface {
 	}
 
 	private static void evolveModel(Options options, Analyzer analyzer, int numberOfEvolutions){
+	  JADD jadd = analyzer.getJadd();
+	  
+	  //Define ordem das variáveis
+	  OUTPUT.print("Previous variable order: ");
+	  
+	  List<String> previousVariableOrder = jadd.readVariableOrder("variableorder.add");
+	  
+	  OUTPUT.println(previousVariableOrder);
+	  
+	  List<String> variableOrder = jadd.getNewVariableOrder(previousVariableOrder);
+	  
+	  OUTPUT.print("New variable order: ");
+	  OUTPUT.println(variableOrder);
+	  
+	  
+	  try {
+		  jadd.setVariableOrder(variableOrder.toArray(new String[0]));
+	  } catch (UnrecognizedVariableException e) {
+		  // TODO Auto-generated catch block
+		  e.printStackTrace();
+	  }
+	  
+	  //Lê ADDs persistidos
 	  String persistedAnalysesPath = options.getPersistedAnalysesPath();
-      Map<String, ADD> analysis = getPreviousAnalysis(analyzer.getJadd(), persistedAnalysesPath);
-
-      LogManager logManager = LogManager.getLogManager();
+	  Map<String, ADD> analysis = getPreviousAnalysis(analyzer.getJadd(), persistedAnalysesPath);
+      
+	  LogManager logManager = LogManager.getLogManager();
       try {
           logManager.readConfiguration(new FileInputStream("logging.properties"));
       } catch(FileNotFoundException e) {
@@ -513,6 +536,7 @@ public class CommandLineInterface {
       memoryCollector.takeSnapshot("before evaluation");
       long analysisStartTime = System.currentTimeMillis();
       Stream<Collection<String>> validConfigs = targetConfigurations.filter(analyzer::isValidConfiguration);
+
       IReliabilityAnalysisResults familyReliability = evaluateReliabilityWithEvolution(analyzer,
                                                                                        rdgRoot,
                                                                                        validConfigs,
@@ -521,25 +545,27 @@ public class CommandLineInterface {
                                                                                        analysis);
 
       memoryCollector.takeSnapshot("after evaluation");
-      
-      if (!options.hasSuppressReport()) {
-          if (options.hasPrintAllConfigurations()) {
-              // This optimizes memory when printing results for all configurations.
-              basePrintAnalysisResults(familyReliability.getNumberOfResults(), () -> familyReliability.printAllResults(OUTPUT));
-          } else {
-              Map<Boolean, List<Collection<String>>> splitConfigs = getTargetConfigurations(options, analyzer)
-                      .collect(Collectors.partitioningBy(analyzer::isValidConfiguration));
-              printAnalysisResults(splitConfigs, familyReliability);
-          }
-      }
-
-      if (options.hasStatsEnabled()) {
-          printStats(OUTPUT, familyReliability, rdgRoot);
-      }
 
       persistAnalysis(analyzer, analysis, persistedAnalysesPath);
+      
       long totalAnalysisTime = System.currentTimeMillis() - analysisStartTime;
       OUTPUT.println("Total analysis time: " +  totalAnalysisTime + " ms\n\n");
+
+//            if (!options.hasSuppressReport()) {
+//          if (options.hasPrintAllConfigurations()) {
+//              // This optimizes memory when printing results for all configurations.
+//              basePrintAnalysisResults(familyReliability.getNumberOfResults(), () -> familyReliability.printAllResults(OUTPUT));
+//          } else {
+//              Map<Boolean, List<Collection<String>>> splitConfigs = getTargetConfigurations(options, analyzer)
+//                      .collect(Collectors.partitioningBy(analyzer::isValidConfiguration));
+//              printAnalysisResults(splitConfigs, familyReliability);
+//          }
+//      }
+      
+      if (options.hasStatsEnabled()) {
+    	  printStats(OUTPUT, familyReliability, rdgRoot);
+      }
+      
       
   }
 
@@ -553,6 +579,7 @@ public class CommandLineInterface {
         }
 
         analyzer.getJadd().writeVariableStore("variableStore.add");
+        analyzer.getJadd().writeVariableOrder("variableorder.add");
     }
 
     private static String getFragmentId(int numberOfEvolutions){
@@ -564,9 +591,7 @@ public class CommandLineInterface {
 
   public static Map<String, ADD> getPreviousAnalysis(JADD jadd, String directoryName) {
       Map<String, ADD> previousAnalysis = new HashMap<String, ADD>();
-
       File directory = new File(directoryName);
-
       if(!directory.exists())
           return previousAnalysis;
       File previousADDs[] = directory.listFiles((dir, file) -> file.endsWith(".add"));
