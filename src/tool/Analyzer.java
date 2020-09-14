@@ -95,12 +95,13 @@ public class Analyzer {
         this.featureModel = expressionSolver.encodeFormula(featureModel);
         // The feature model contains all used variables, so we expect to
         // be able to generate an optimal ordering right after parsing it.
-        jadd.reorderVariables();
+        if (i == 0) {
+        	jadd.reorderVariables();
+        }
 
         this.timeCollector = (timeCollector != null) ? timeCollector : new NoopTimeCollector();
         this.formulaCollector = (formulaCollector != null) ? formulaCollector : new NoopFormulaCollector();
         this.modelChecker = (modelCollector != null) ? new ParamWrapper(paramPath, modelCollector) : new ParamWrapper(paramPath);
-
         this.featureFamilyBasedAnalyzerImpl = new FeatureFamilyBasedAnalyzer(this.jadd,
                                                                              this.featureModel,
                                                                              this.modelChecker,

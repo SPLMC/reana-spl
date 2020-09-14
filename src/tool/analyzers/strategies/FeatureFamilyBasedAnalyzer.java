@@ -91,7 +91,6 @@ public class FeatureFamilyBasedAnalyzer {
      */
     public IReliabilityAnalysisResults evaluateReliability(RDGNode node, ConcurrencyStrategy concurrencyStrategy, String dotOutput, Map<String, ADD> previousAnalysis) throws CyclicRdgException {
         List<RDGNode> dependencies = node.getDependenciesTransitiveClosure();
-
         timeCollector.startTimer(CollectibleTimers.MODEL_CHECKING_TIME);
         // Alpha_v
         long alphaTime = System.currentTimeMillis();
@@ -115,8 +114,9 @@ public class FeatureFamilyBasedAnalyzer {
         timeCollector.stopTimer(CollectibleTimers.EXPRESSION_SOLVING_TIME);
         
 //        if (dotOutput != null) {
-//            generateDotFile(result, dotOutput);
+//            generateDotFile(result, "saida.dot");
 //        }
+        previousAnalysis.remove(node.getId());
 
         return new ADDReliabilityResults(result);
     }
@@ -124,6 +124,7 @@ public class FeatureFamilyBasedAnalyzer {
     public IReliabilityAnalysisResults evaluateReliabilityWithEvolution(RDGNode node, ConcurrencyStrategy concurrencyStrategy, String dotOutput, String idFragment, Map<String, ADD> previousAnalysis) throws CyclicRdgException {
     	System.out.println ("***** Evolution aware reliability analysis *****");
     	List<RDGNode> dependencies = getModifiedNodes(node, idFragment, previousAnalysis);
+//    	generateDotFile(previousAnalysis.get("drawBuffer"), "ADD.dot");
     	long alphaTime = System.currentTimeMillis();
         timeCollector.startTimer(CollectibleTimers.MODEL_CHECKING_TIME);
         // Alpha_v
@@ -139,22 +140,24 @@ public class FeatureFamilyBasedAnalyzer {
                 .collect(Collectors.toList());
         liftTime = System.currentTimeMillis() - liftTime;
         System.out.println ("++++++ Lift Time: " + liftTime + " ++++++");
-        
-        long reorderTime = System.currentTimeMillis();
-        jadd.reorderVariables();
-        reorderTime = System.currentTimeMillis() - reorderTime;
-        System.out.println ("++++++ Reorder Time: " + reorderTime + " ++++++");
-        
+        //Reorder
+//        if (idFragment.contentEquals("SD_2") || idFragment.contentEquals("SD_5") || idFragment.contentEquals("SD_8") || idFragment.contentEquals("SD_11") || idFragment.contentEquals("SD_14") || idFragment.contentEquals("SD_17") || idFragment.contentEquals("SD_20") || idFragment.contentEquals("SD_23") || idFragment.contentEquals("SD_26") || idFragment.contentEquals("SD_29")) {
+//        if (idFragment.contentEquals("SD_2")) {
+//        	long reorderTime = System.currentTimeMillis();
+//        	jadd.reorderVariables();
+//        	reorderTime = System.currentTimeMillis() - reorderTime;
+//        	System.out.println ("++++++ Reorder Time: " + reorderTime + " ++++++");
+//        }
+//        generateDotFile(previousAnalysis.get("Capture"), "capturePosOrder"+idFragment+".dot");
         // Sigma_v
         long sigmaTime = System.currentTimeMillis();
-
         ADD reliability = newSolveFromMany(liftedExpressions, previousAnalysis);
         ADD result = featureModel.times(reliability);
         sigmaTime = System.currentTimeMillis() - sigmaTime;
-
         System.out.println ("++++++ Sigma Time: " + sigmaTime + " ++++++");
-
         timeCollector.stopTimer(CollectibleTimers.EXPRESSION_SOLVING_TIME);
+
+//        generateDotFile(previousAnalysis.get("Capture"), "capturePos"+idFragment+".dot");
         
         
 //        for(String s : previousAnalysis.keySet()){
@@ -162,7 +165,7 @@ public class FeatureFamilyBasedAnalyzer {
 //        }
         
 //        if (true) {
-//        	generateDotFile(result, "saida6.dot");
+//        	generateDotFile(result, "saida1.dot");
 //        }
        
         //remove a raiz
