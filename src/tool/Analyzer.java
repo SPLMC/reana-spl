@@ -26,8 +26,10 @@ import tool.analyzers.strategies.FeatureProductBasedAnalyzer;
 import tool.analyzers.strategies.ProductBasedAnalyzer;
 import tool.stats.CollectibleTimers;
 import tool.stats.IFormulaCollector;
+import tool.stats.IReuseCollector;
 import tool.stats.ITimeCollector;
 import tool.stats.NoopFormulaCollector;
+import tool.stats.NoopReuseCollector;
 import tool.stats.NoopTimeCollector;
 import expressionsolver.ExpressionSolver;
 
@@ -50,6 +52,7 @@ public class Analyzer {
 
     private ITimeCollector timeCollector;
     private IFormulaCollector formulaCollector;
+    private IReuseCollector reuseCollector;
 
     FeatureFamilyBasedAnalyzer featureFamilyBasedAnalyzerImpl;
     FeatureProductBasedAnalyzer featureProductBasedAnalyzerImpl;
@@ -65,12 +68,12 @@ public class Analyzer {
      *          expressed using Java logical operators.
      * @throws IOException if there is a problem reading the file.
      */
-    public Analyzer(String featureModel, String paramPath, ITimeCollector timeCollector, IFormulaCollector formulaCollector, IModelCollector modelCollector, int i) {
-        this(new JADD(), featureModel, paramPath, timeCollector, formulaCollector, modelCollector, i);
+    public Analyzer(String featureModel, String paramPath, ITimeCollector timeCollector, IFormulaCollector formulaCollector, IModelCollector modelCollector, IReuseCollector reuseCollector, int i) {
+        this(new JADD(), featureModel, paramPath, timeCollector, formulaCollector, modelCollector, reuseCollector, i);
     }
     
-    public Analyzer(String featureModel, String paramPath, ITimeCollector timeCollector, IFormulaCollector formulaCollector, IModelCollector modelCollector, int i, boolean evol) {
-        this(new JADD("variableStore.add"), featureModel, paramPath, timeCollector, formulaCollector, modelCollector, i);
+    public Analyzer(String featureModel, String paramPath, ITimeCollector timeCollector, IFormulaCollector formulaCollector, IModelCollector modelCollector, IReuseCollector reuseCollector, int i, boolean evol) {
+        this(new JADD("variableStore.add"), featureModel, paramPath, timeCollector, formulaCollector, modelCollector, reuseCollector, i);
     }
 
     /**
@@ -80,7 +83,7 @@ public class Analyzer {
      * @param featureModel
      */
     Analyzer(JADD jadd, String featureModel, String paramPath) {
-        this(jadd, featureModel, paramPath, null, null, null, 0);
+        this(jadd, featureModel, paramPath, null, null, null, null, 0);
     }
 
 
@@ -89,7 +92,7 @@ public class Analyzer {
      * @param jadd
      * @param featureModel
      */
-    private Analyzer(JADD jadd, String featureModel, String paramPath, ITimeCollector timeCollector, IFormulaCollector formulaCollector, IModelCollector modelCollector, int i) {
+    private Analyzer(JADD jadd, String featureModel, String paramPath, ITimeCollector timeCollector, IFormulaCollector formulaCollector, IModelCollector modelCollector, IReuseCollector reuseCollector, int i) {
         this.jadd = jadd;
         this.expressionSolver = new ExpressionSolver(jadd);
         this.featureModel = expressionSolver.encodeFormula(featureModel);
@@ -101,12 +104,14 @@ public class Analyzer {
 
         this.timeCollector = (timeCollector != null) ? timeCollector : new NoopTimeCollector();
         this.formulaCollector = (formulaCollector != null) ? formulaCollector : new NoopFormulaCollector();
+        this.reuseCollector = (reuseCollector != null) ? reuseCollector : new NoopReuseCollector();
         this.modelChecker = (modelCollector != null) ? new ParamWrapper(paramPath, modelCollector) : new ParamWrapper(paramPath);
         this.featureFamilyBasedAnalyzerImpl = new FeatureFamilyBasedAnalyzer(this.jadd,
                                                                              this.featureModel,
                                                                              this.modelChecker,
                                                                              this.timeCollector,
-                                                                             this.formulaCollector);
+                                                                             this.formulaCollector,
+                                                                             this.reuseCollector);
         this.featureProductBasedAnalyzerImpl = new FeatureProductBasedAnalyzer(this.jadd,
                                                                                this.modelChecker,
                                                                                this.timeCollector,

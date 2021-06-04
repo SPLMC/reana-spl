@@ -57,6 +57,7 @@ import tool.stats.CollectibleTimers;
 import tool.stats.IFormulaCollector;
 import tool.stats.IMemoryCollector;
 import tool.stats.ITimeCollector;
+import tool.stats.IReuseCollector;
 import ui.stats.StatsCollectorFactory;
 import jadd.ADD;
 import jadd.JADD;
@@ -76,6 +77,7 @@ public class CommandLineInterface {
     private static ITimeCollector timeCollector;
     private static IFormulaCollector formulaCollector;
     private static IModelCollector modelCollector;
+    private static IReuseCollector reuseCollector;
 
     private CommandLineInterface() {
 	// NO-OP
@@ -90,9 +92,9 @@ public class CommandLineInterface {
 	if(evolutionNumber == 0){
 	    LogManager logManager = LogManager.getLogManager();
 	    try {
-		logManager.readConfiguration(new FileInputStream("logging.properties"));
+	        logManager.readConfiguration(new FileInputStream("logging.properties"));
 	    } catch(FileNotFoundException e) {
-		e.printStackTrace();
+	        e.printStackTrace();
 	    }
 	    initializeStatsCollectors(options);
 
@@ -117,18 +119,18 @@ public class CommandLineInterface {
 	    memoryCollector.takeSnapshot("after evaluation");
 
 	    if (!options.hasSuppressReport()) {
-		if (options.hasPrintAllConfigurations()) {
+	        if (options.hasPrintAllConfigurations()) {
 		    // This optimizes memory when printing results for all configurations.
-		    basePrintAnalysisResults(familyReliability.getNumberOfResults(), () -> familyReliability.printAllResults(OUTPUT));
-		} else {
+	            basePrintAnalysisResults(familyReliability.getNumberOfResults(), () -> familyReliability.printAllResults(OUTPUT));
+	        } else {
 		    Map<Boolean, List<Collection<String>>> splitConfigs = getTargetConfigurations(options, analyzer)
 			    .collect(Collectors.partitioningBy(analyzer::isValidConfiguration));
 		    printAnalysisResults(splitConfigs, familyReliability);
-		}
+		    }
 	    }
 
 	    if (options.hasStatsEnabled()) {
-		printStats(OUTPUT, familyReliability, rdgRoot);
+	        printStats(OUTPUT, familyReliability, rdgRoot);
 	    }
 	    long totalRunningTime = System.currentTimeMillis() - startTime;
 	    OUTPUT.println("Total analysis time: " +  totalAnalysisTime + " ms");
@@ -214,12 +216,12 @@ public class CommandLineInterface {
       IReliabilityAnalysisResults results = null;
       String dotOutput = "family-reliability.dot";
       try {
-	analyzer.setPruningStrategy(PruningStrategyFactory.createPruningStrategy(options.getPruningStrategy()));
-	results = analyzer.evaluateFeatureFamilyBasedReliabilityWithEvolution(rdgRoot, "saida.dot", idFragment, previousAnalysis);
+          analyzer.setPruningStrategy(PruningStrategyFactory.createPruningStrategy(options.getPruningStrategy()));
+          results = analyzer.evaluateFeatureFamilyBasedReliabilityWithEvolution(rdgRoot, "saida.dot", idFragment, previousAnalysis);
       } catch (CyclicRdgException e) {
-	LOGGER.severe("Cyclic dependency detected in RDG.");
-	LOGGER.log(Level.SEVERE, e.toString(), e);
-	System.exit(2);
+          LOGGER.severe("Cyclic dependency detected in RDG.");
+          LOGGER.log(Level.SEVERE, e.toString(), e);
+          System.exit(2);
       }
       return results;
     }
@@ -255,6 +257,7 @@ public class CommandLineInterface {
 					 timeCollector,
 					 formulaCollector,
 					 modelCollector,
+					 reuseCollector,
 					 i);
 	analyzer.setConcurrencyStrategy(options.getConcurrencyStrategy());
 	return analyzer;
@@ -270,6 +273,7 @@ public class CommandLineInterface {
 					 timeCollector,
 					 formulaCollector,
 					 modelCollector,
+					 reuseCollector,
 					 i,
 					 evol);
 	analyzer.setConcurrencyStrategy(options.getConcurrencyStrategy());
@@ -280,11 +284,12 @@ public class CommandLineInterface {
      * @param options
      */
     private static void initializeStatsCollectors(Options options) {
-	StatsCollectorFactory statsCollectorFactory = new StatsCollectorFactory(options.hasStatsEnabled());
-	memoryCollector = statsCollectorFactory.createMemoryCollector();
-	timeCollector = statsCollectorFactory.createTimeCollector();
-	formulaCollector = statsCollectorFactory.createFormulaCollector();
-	modelCollector = statsCollectorFactory.createModelCollector();
+        StatsCollectorFactory statsCollectorFactory = new StatsCollectorFactory(options.hasStatsEnabled());
+        memoryCollector = statsCollectorFactory.createMemoryCollector();
+        timeCollector = statsCollectorFactory.createTimeCollector();
+        formulaCollector = statsCollectorFactory.createFormulaCollector();
+        modelCollector = statsCollectorFactory.createModelCollector();
+        reuseCollector = statsCollectorFactory.createReuseCollector();
     }
 
     private static Stream<Collection<String>> getTargetConfigurations(Options options, Analyzer analyzer) {
@@ -295,24 +300,24 @@ public class CommandLineInterface {
 
 	    List<String> rawConfigurations = new LinkedList<String>();
 	    if (options.getConfiguration() != null) {
-		rawConfigurations.add(options.getConfiguration());
+	        rawConfigurations.add(options.getConfiguration());
 	    } else {
-		Path configurationsFilePath = Paths.get(options.getConfigurationsFilePath());
-		try {
-		    rawConfigurations.addAll(Files.readAllLines(configurationsFilePath, Charset.forName("UTF-8")));
-		} catch (IOException e) {
-		    LOGGER.severe("Error reading the provided configurations file.");
-		    LOGGER.log(Level.SEVERE, e.toString(), e);
-		}
+	        Path configurationsFilePath = Paths.get(options.getConfigurationsFilePath());
+	        try {
+	            rawConfigurations.addAll(Files.readAllLines(configurationsFilePath, Charset.forName("UTF-8")));
+	        } catch (IOException e) {
+	            LOGGER.severe("Error reading the provided configurations file.");
+	            LOGGER.log(Level.SEVERE, e.toString(), e);
+	        }
 	    }
 
 	    for (String rawConfiguration: rawConfigurations) {
-		String[] variables = rawConfiguration.split(",");
-		configurations.add(Arrays.asList(variables));
+	        String[] variables = rawConfiguration.split(",");
+	        configurations.add(Arrays.asList(variables));
 	    }
 
 	    return configurations.stream();
-	}
+	    }
     }
 
     private static void basePrintAnalysisResults(int numResults, Runnable printer) {
@@ -329,28 +334,28 @@ public class CommandLineInterface {
 	    // Ordered report
 	    validConfigs.sort((c1, c2) -> c1.toString().compareTo(c2.toString()));
 	    for (Collection<String> validConfig: validConfigs) {
-		try {
-		    String[] configurationAsArray = validConfig.toArray(new String[validConfig.size()]);
-		    printSingleConfiguration(validConfig.toString(),
-			    familyReliability.getResult(configurationAsArray));
-		} catch (UnknownFeatureException e) {
-		    LOGGER.severe("Unrecognized feature: " + e.getFeatureName());
-		    LOGGER.log(Level.SEVERE, e.toString(), e);
-		}
+	        try {
+	            String[] configurationAsArray = validConfig.toArray(new String[validConfig.size()]);
+	            printSingleConfiguration(validConfig.toString(),
+	                    familyReliability.getResult(configurationAsArray));
+	        } catch (UnknownFeatureException e) {
+	            LOGGER.severe("Unrecognized feature: " + e.getFeatureName());
+	            LOGGER.log(Level.SEVERE, e.toString(), e);
+	        }
 	    }
 	    for (Collection<String> invalidConfig: splitConfigs.get(false)) {
-		printSingleConfiguration(invalidConfig.toString(), 0);
+	        printSingleConfiguration(invalidConfig.toString(), 0);
 	    }
 	});
     }
 
     private static void printSingleConfiguration(String configuration, double reliability) {
-	String message = configuration + " --> ";
-	if (Double.doubleToRawLongBits(reliability) != 0) {
-	    OUTPUT.println(message + reliability);
-	} else {
-	    OUTPUT.println(message + "INVALID");
-	}
+        String message = configuration + " --> ";
+        if (Double.doubleToRawLongBits(reliability) != 0) {
+            OUTPUT.println(message + reliability);
+        } else {
+            OUTPUT.println(message + "INVALID");
+        }
     }
 
     private static void printStats(PrintStream out, IReliabilityAnalysisResults familyReliability, RDGNode rdgRoot) {
@@ -361,26 +366,9 @@ public class CommandLineInterface {
 	formulaCollector.printStats(out);
 	modelCollector.printStats(out);
 	memoryCollector.printStats(out);
-	printEvaluationReuse(rdgRoot);
+	reuseCollector.printStats(out);
+	reuseCollector.printEvaluationReuse(out, rdgRoot);
 	familyReliability.printStats(out);
-    }
-
-    private static void printEvaluationReuse(RDGNode rdgRoot) {
-	try {
-	    Map<RDGNode, Integer> numberOfPaths = rdgRoot.getNumberOfPaths();
-	    int nodes = 0;
-	    int totalPaths = 0;
-	    for (Map.Entry<RDGNode, Integer> entry: numberOfPaths.entrySet()) {
-		nodes++;
-		totalPaths += entry.getValue();
-		OUTPUT.println(entry.getKey() + ": " + entry.getValue() + " paths");
-	    }
-	    OUTPUT.println("Evaluation economy because of cache: " + 100*(totalPaths-nodes)/(float)totalPaths + "%");
-	} catch (CyclicRdgException e) {
-	    LOGGER.severe("Cyclic dependency detected in RDG.");
-	    LOGGER.log(Level.SEVERE, e.toString(), e);
-	    System.exit(2);
-	}
     }
 
     /**
@@ -521,12 +509,13 @@ public class CommandLineInterface {
 
 	  LogManager logManager = LogManager.getLogManager();
       try {
-	  logManager.readConfiguration(new FileInputStream("logging.properties"));
+          logManager.readConfiguration(new FileInputStream("logging.properties"));
       } catch(FileNotFoundException e) {
-	  e.printStackTrace();
+          e.printStackTrace();
       } catch(IOException e) {
 
       }
+
       initializeStatsCollectors(options);
 
       memoryCollector.takeSnapshot("before model parsing");
@@ -563,7 +552,7 @@ public class CommandLineInterface {
       }
 
       if (options.hasStatsEnabled()) {
-	  printStats(OUTPUT, familyReliability, rdgRoot);
+          printStats(OUTPUT, familyReliability, rdgRoot);
       }
 
 
@@ -596,9 +585,10 @@ public class CommandLineInterface {
 	  return previousAnalysis;
       File previousADDs[] = directory.listFiles((dir, file) -> file.endsWith(".add"));
       for(File file : previousADDs) {
-	String fileName = file.getName();
-	  ADD retrievedResult = jadd.readADDpreviousAnalysis(directoryName + fileName);
-	  previousAnalysis.put(fileName.substring(0, fileName.length() - 4), retrievedResult);
+          String fileName = file.getName();
+          System.out.println("Retrieved previous result: " + fileName);
+          ADD retrievedResult = jadd.readADDpreviousAnalysis(directoryName + fileName);
+          previousAnalysis.put(fileName.substring(0, fileName.length() - 4), retrievedResult);
       }
 
       return previousAnalysis;

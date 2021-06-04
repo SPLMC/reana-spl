@@ -25,6 +25,7 @@ import tool.analyzers.buildingblocks.DerivationFunction;
 import tool.analyzers.buildingblocks.FamilyBasedHelper;
 import tool.stats.CollectibleTimers;
 import tool.stats.IFormulaCollector;
+import tool.stats.IReuseCollector;
 import tool.stats.ITimeCollector;
 import expressionsolver.Expression;
 import expressionsolver.ExpressionSolver;
@@ -49,17 +50,20 @@ public class FeatureFamilyBasedAnalyzer {
 
 
     private ITimeCollector timeCollector;
+    private IReuseCollector reuseCollector;
 
     public FeatureFamilyBasedAnalyzer(JADD jadd,
                                       ADD featureModel,
                                       ParametricModelChecker modelChecker,
                                       ITimeCollector timeCollector,
-                                      IFormulaCollector formulaCollector) {
+                                      IFormulaCollector formulaCollector,
+                                      IReuseCollector reuseCollector) {
         this.expressionSolver = new ExpressionSolver(jadd);
         this.jadd = jadd;
         this.featureModel = featureModel;
 
         this.timeCollector = timeCollector;
+        this.reuseCollector = reuseCollector;
         this.pruningStrategy = new NoPruningStrategy();
 
         this.firstPhase = new FeatureBasedFirstPhase(modelChecker,
@@ -124,6 +128,9 @@ public class FeatureFamilyBasedAnalyzer {
     public IReliabilityAnalysisResults evaluateReliabilityWithEvolution(RDGNode node, ConcurrencyStrategy concurrencyStrategy, String dotOutput, String idFragment, Map<String, ADD> previousAnalysis) throws CyclicRdgException {
     	System.out.println ("***** Evolution aware reliability analysis *****");
     	List<RDGNode> dependencies = getModifiedNodes(node, idFragment, previousAnalysis);
+    	for (RDGNode impactedNode: dependencies) {
+    	    reuseCollector.logImpactedNode(impactedNode.getId());
+    	}
 //    	generateDotFile(previousAnalysis.get("drawBuffer"), "ADD.dot");
     	long alphaTime = System.currentTimeMillis();
         timeCollector.startTimer(CollectibleTimers.MODEL_CHECKING_TIME);

@@ -3,9 +3,11 @@ package ui.stats;
 import paramwrapper.IModelCollector;
 import tool.stats.IFormulaCollector;
 import tool.stats.IMemoryCollector;
+import tool.stats.IReuseCollector;
 import tool.stats.ITimeCollector;
 import tool.stats.NoopFormulaCollector;
 import tool.stats.NoopMemoryCollector;
+import tool.stats.NoopReuseCollector;
 import tool.stats.NoopTimeCollector;
 
 public class StatsCollectorFactory {
@@ -45,6 +47,14 @@ public class StatsCollectorFactory {
             return new ModelCollector();
         } else {
             return null;
+        }
+    }
+
+    public IReuseCollector createReuseCollector() {
+        if (collectionEnabled) {
+            return new ReuseCollector();
+        } else {
+            return new NoopReuseCollector();
         }
     }
 
